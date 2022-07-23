@@ -1,0 +1,73 @@
+.cell {
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+    position: relative;
+}
+
+.cell.selected {
+    background-color: dodgerblue !important;
+}
+
+.cell:hover, .cell.selected:hover {
+    background-color: aqua !important;
+}
+
+.cell.areaColorGreen {
+    background-color: rgb(179, 255, 103);
+}
+
+.cell.areaColorYellow {
+    background-color: rgb(255, 255, 131);
+}
+
+.cell.areaColorRed {
+    background-color: rgb(255, 148, 148);
+}
+
+.cell.areaColorPurple {
+    background-color: rgb(175, 153, 255);
+}
+
+.cell.areaColorTurqoise {
+    background-color: rgb(121, 253, 240);
+}
+
+.cell.box-bottom {
+    border-bottom: 3px solid black;
+}
+
+.cell.box-right {
+    border-right: 3px solid black;
+}
+
+.cellValue, .cellOptions, .cellOption {
+    width: 100%;
+    height: 100%;
+}
+
+.cellValue {
+    padding-top: 0.1em;
+    font-size: 2.4em;
+    text-align: center;
+    line-height: 100%;
+}
+
+.cellOptions {
+    display: grid;
+    grid-template-columns: repeat(3, 24%);
+    grid-template-rows: repeat(3, 24%);
+    font-size: 0.5em;
+    text-align: center;
+    line-height: 100%;
+    box-sizing: border-box;
+    padding: 15%;
+}
+
+.cellOption.inactive {
+    visibility: hidden;
+}
+
+.areaValue {
+    position: absolute;
+    font-size: 0.8em;
+}
