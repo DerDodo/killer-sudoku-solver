@@ -1,0 +1,348 @@
+import Area from "../types/Area";
+import Board from "../types/Board";
+import Cell from "../types/Cell";
+import { isEqualArray, isSubArray } from "./ArrayUtil";
+import { numbers1to9 } from "./NumberUtil";
+
+export default class Solver {
+    private board: Board
+
+    constructor(board: Board) {
+        this.board = board
+    }
+    
+    public solve() {
+        var prevNumFilledCells = 0
+        var newNumFilledCells = 0
+        do {
+            prevNumFilledCells = this.calcNumFilledCells()
+            this.completeSingleMissingValues()
+            this.calcOptions()
+            this.solveSingleOptions()
+            this.solveUniqueOptions()
+            this.solveSubGroupOptionRest()
+            newNumFilledCells = this.calcNumFilledCells()
+        } while(prevNumFilledCells != newNumFilledCells)
+    }
+
+    completeSingleMissingValues() {
+        var changed = false
+        do {
+            changed = false
+            if (this.completeRows()) changed = true
+            if (this.completeColumns()) changed = true
+            if (this.completeBoxes()) changed = true
+            if (this.completeAreas()) changed = true
+        } while (changed)
+    }
+
+    completeAreas(): boolean {
+        var success = false
+        this.board.areas.forEach((area => {
+            const cells = area.cells
+            if (this.isOnlyOneValueMissing(cells)) {
+                const val = area.getRemainingValue()
+                if (val > 0 && val < 10) {
+                    this.fillSingleMissingCell(cells, val)
+                    success = true
+                }
+            }
+        }))
+        return success
+    }
+
+    completeRows(): boolean {
+        var success = false
+        this.board.getRows().forEach((row => {
+            if (this.isOnlyOneValueMissing(row)) {
+                this.fillSingleMissingCell(row, this.findMissingValue(row))
+                success = true
+            }
+        }))
+        return success
+    }
+
+    completeColumns(): boolean {
+        var success = false
+        this.board.getCols().forEach((col => {
+            if (this.isOnlyOneValueMissing(col)) {
+                this.fillSingleMissingCell(col, this.findMissingValue(col))
+                success = true
+            }
+        }))
+        return success
+    }
+
+    completeBoxes(): boolean {
+        var success = false
+        this.board.getBoxes().forEach((box => {
+            if (this.isOnlyOneValueMissing(box)) {
+                this.fillSingleMissingCell(box, this.findMissingValue(box))
+                success = true
+            }
+        }))
+        return success
+    }
+
+    isOnlyOneValueMissing(cells: Cell[]) {
+        return cells.filter(cell => !cell.value).length == 1
+    }
+
+    fillSingleMissingCell(cells: Cell[], value: number) {
+        cells.find(cell => !cell.value).value = value
+    }
+
+    findMissingValue(cells: Cell[]): number | null {
+        const setValues = cells.map(cell => cell.value).filter(cell => cell != null)
+        const missingValues = numbers1to9().filter(val => !setValues.includes(val))
+        if (missingValues.length == 1) {
+            return missingValues[0]
+        } else {
+            return null
+        }
+    }
+
+    calcOptions() {
+        this.fillAllOptions()
+        var prevNumOptions = 0
+        var newNumOptions = 0
+        do {
+            prevNumOptions = this.sumNumOptions()
+            this.reduceDirectOptions()
+            this.reduceAreaOptionsLowAndHighNumbers()
+            this.reduceTwoCellAreas()
+            this.reduceIfClosedSubset()
+            this.reduceImpossibleNumbers()
+            newNumOptions = this.sumNumOptions()
+        } while(prevNumOptions != newNumOptions)
+    }
+
+    sumNumOptions() {
+        return this.board.cells.flat().filter(cell => !cell.value).reduce(function (s, a) {
+            return s + a.options.length;
+        }, 0)
+    }
+
+    fillAllOptions() {
+        this.board.cells.flat().forEach(cell => {
+            if (cell.value) {
+                cell.clearOptions()
+            } else {
+                cell.setOptions1To9()
+            }
+        })
+    }
+
+    reduceDirectOptions() {
+        for (var row = 0; row < 9; ++row) {
+            for (var col = 0; col < 9; ++col) {
+                const filledCell = this.board.cells[row][col]
+                if (filledCell.value) {
+                    this.board.getRow(row).forEach(cell => cell.removeOption(filledCell.value))
+                    this.board.getCol(col).forEach(cell => cell.removeOption(filledCell.value))
+                    this.board.getBoxByCoordinates(row, col).forEach(cell => cell.removeOption(filledCell.value))
+                }
+            }
+        }
+    }
+
+    reduceAreaOptionsLowAndHighNumbers() {
+        this.board.areas.forEach(area => {
+            const remainingAreaValue = area.getRemainingValue()
+            if (remainingAreaValue > 0) {
+                const cells = area.cells
+                const missingValues = this.getMissingValues(cells)
+                const missingCells = cells.filter(cell => !cell.value)
+                var minValue = 0
+                var maxValue = 0
+                for (var i = 0; i < missingCells.length - 1; ++i) {
+                    minValue += missingValues[i]
+                    maxValue += missingValues[missingValues.length - i - 1]
+                }
+
+                for (var i = 0; i < missingValues.length - missingCells.length + 1; ++i) {
+                    if (minValue + missingValues[missingValues.length - i] > remainingAreaValue) {
+                        missingCells.forEach(cell => cell.removeOption(missingValues[missingValues.length - i]))
+                    }
+                    if (maxValue + missingValues[i] < remainingAreaValue) {
+                        missingCells.forEach(cell => cell.removeOption(missingValues[i]))
+                    }
+                }
+            }
+        })
+    }
+
+    reduceTwoCellAreas() {
+        this.board.areas.forEach(area => {
+            const cells = area.cells
+            const missingCells = cells.filter(cell => !cell.value)
+            if (missingCells.length == 2) {
+                const remainingAreaValue = area.getRemainingValue()
+                this.reduceTwoCellAreasPartnerValues(missingCells[0], missingCells[1], remainingAreaValue)
+                this.reduceTwoCellAreasPartnerValues(missingCells[1], missingCells[0], remainingAreaValue)
+                this.halfMissingAreaValue(missingCells[0], missingCells[1], remainingAreaValue)
+            }
+        })
+    }
+
+    reduceTwoCellAreasPartnerValues(cell0: Cell, cell1: Cell, remainingAreaValue: number) {
+        cell0.options.forEach(option => {
+            const partnerValue = remainingAreaValue - option
+            if (!cell1.options.includes(partnerValue)) {
+                cell0.removeOption(option)
+            }
+        })
+    }
+
+    halfMissingAreaValue(cell0: Cell, cell1: Cell, remainingAreaValue: number) {
+        if (remainingAreaValue % 2 == 0) {
+            cell0.removeOption(remainingAreaValue / 2)
+            cell1.removeOption(remainingAreaValue / 2)
+        }
+    }
+
+    reduceIfClosedSubset() {
+        this.board.getRows().forEach(row => this.reduceIfClosedSubsetForCells(row))
+        this.board.getCols().forEach(col => this.reduceIfClosedSubsetForCells(col))
+        this.board.getBoxes().forEach(box => this.reduceIfClosedSubsetForCells(box))
+    }
+
+    reduceIfClosedSubsetForCells(cells: Cell[]) {
+        const emptyCells = cells.filter(cell => !cell.value)
+        emptyCells.forEach(cell => {
+            const numOptions = cell.options.length
+            var subOptions = 0
+            const equalCells: Cell[] = []
+            emptyCells.filter(otherCell => otherCell.options.length <= numOptions).forEach(comparisonCell => {
+                if (isSubArray(cell.options, comparisonCell.options)) {
+                    subOptions += 1
+                    equalCells.push(comparisonCell)
+                }
+            })
+
+            if (subOptions == numOptions) {
+                const otherCells = this.getOtherCells(emptyCells, equalCells)
+                cell.options.forEach(option => {
+                    otherCells.forEach(cell => cell.removeOption(option))
+                })
+            }
+        })
+    }
+
+    reduceImpossibleNumbers() {
+        this.board.areas.forEach(area => {
+            const areaCells = area.cells
+            const emptyCells = areaCells.filter(cell => !cell.value)
+            const remainingValue = area.getRemainingValue()
+            if (emptyCells.length > 1) {
+                emptyCells.forEach(cell => {
+                    let otherCells = emptyCells.filter(c => c.index != cell.index)
+                    cell.options.forEach(option => {
+                        if (!this.canSumUpTo(otherCells, remainingValue - option, [option])) {
+                            cell.removeOption(option)
+                        }
+                    })
+                })
+            }
+        })
+    }
+
+    canSumUpTo(cells: Cell[], targetValue: number, forbiddenOptions: number[]): boolean {
+        if (cells.length == 1) {
+            return cells[0].options.includes(targetValue) && !forbiddenOptions.includes(targetValue)
+        } else {
+            for (let cell of cells) {
+                let otherCells = cells.filter(c => c.index != cell.index)
+                for (let option of cell.options) {
+                    if (!forbiddenOptions.includes(option)) {
+                        let forbiddenOptionsCopy = [...forbiddenOptions, option]
+                        if (this.canSumUpTo(otherCells, targetValue - option, forbiddenOptionsCopy)) {
+                            return true
+                        }
+                    }
+                }
+            }
+            return false
+        }
+    }
+
+    areAllOptionsEqual(cells: Cell[]): boolean {
+        return cells.filter(cell => isEqualArray(cell.options, cells[0].options)).length == cells.length
+    }
+
+    getOtherCells(allCells: Cell[], minus: Cell[]): Cell[] {
+        const allIds = minus.map(cell => cell.index)
+        return allCells.filter(cell => !allIds.includes(cell.index))
+    }
+    
+    getMissingValues(cells: Cell[]): number[] {
+        const allValues = cells.map(cell => cell.value)
+        return numbers1to9().filter(value => !allValues.includes(value))
+    }
+
+    solveSingleOptions() {
+        this.board.cells.flat().forEach(cell => {
+            if (!cell.value && cell.options.length == 1) {
+                cell.value = cell.options[0]
+            }
+        })
+    }
+
+    solveUniqueOptions() {
+        this.board.getRows().forEach(row => { this.solveUniqueOptionsForCells(row) })
+        this.board.getCols().forEach(col => { this.solveUniqueOptionsForCells(col) })
+        this.board.getBoxes().forEach(box => { this.solveUniqueOptionsForCells(box) })
+    }
+
+    solveUniqueOptionsForCells(cells: Cell[]) {
+        const filledValues = cells.map(cell => cell.value)
+        const emptyCells = cells.filter(cell => !cell.value)
+        numbers1to9().filter(val => !filledValues.includes(val)).forEach(val => {
+            var numOptions = emptyCells.filter(cell => cell.options.includes(val)).length
+            if (numOptions == 1) {
+                cells.find(cell => cell.options.includes(val)).value = val
+            }
+        })
+    }
+
+    solveSubGroupOptionRest() {
+        this.board.areas.forEach(area => {
+            const areaCells = area.cells
+            const emptyCells = areaCells.filter(cell => !cell.value)
+            const remainingValue = area.getRemainingValue()
+            const optionSubgroups = this.findOptionSubgroups(area)
+            var subgroupsValue = 0
+            var subgroupsNumCells = 0
+            optionSubgroups.forEach(subgroup => {
+                subgroup.forEach(val => {
+                    subgroupsNumCells += 1
+                    subgroupsValue += val
+                })
+            })
+
+            if (emptyCells.length - subgroupsNumCells == 1) {
+                emptyCells.find(cell => {
+                    return !optionSubgroups.find(options => isEqualArray(options, cell.options))
+                }).value = remainingValue - subgroupsValue
+            }
+        })
+    }
+
+    findOptionSubgroups(area: Area): number[][] {
+        const areaCells = area.cells
+        const emptyCells = areaCells.filter(cell => !cell.value)
+        let optionSubgroups: number[][] = []
+        emptyCells.forEach(cell => {
+            if (emptyCells.filter(otherCell => isEqualArray(otherCell.options, cell.options)).length == cell.options.length) {
+                if (!optionSubgroups.find(options => isEqualArray(options, cell.options))) {
+                    optionSubgroups.push(cell.options)
+                }
+            }
+        })
+        return optionSubgroups
+    }
+
+    calcNumFilledCells(): number {
+        return this.board.cells.flat().filter(cell => !!cell.value).length
+    }
+}
