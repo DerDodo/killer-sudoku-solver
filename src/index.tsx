@@ -1,10 +1,11 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import Cell from "./types/Cell";
+import CellDto from "./dto/CellDto";
 import MenuComponent from "./components/MenuComponent";
 import { Provider } from "react-redux";
 import { store } from "./store"
 import BoardComponent from "./components/BoardComponent";
+import BoardDto from "./dto/BoardDto";
 import Board from "./types/Board";
 
 const rootElement = document.getElementById("root");
@@ -13,22 +14,23 @@ const root = createRoot(rootElement);
 const save = localStorage.getItem("board")
 var board: Board
 if (save) {
-  board = JSON.parse(save) as Board
+  board = new Board(JSON.parse(save) as BoardDto)
 } else {
-  board = { cells: initCells(), areas: [] }
+  board = new Board({ cells: initCells(), areas: [] })
 }
+
 
 root.render(
     <Provider store={store}>
       <MenuComponent />
-      <BoardComponent cells={board.cells} areas={board.areas} />
+      <BoardComponent board={board} />
     </Provider>
 )
 
 export function initCells() {
-  let cells: Cell[][] = []
+  let cells: CellDto[][] = []
   for (var row = 0; row < 9; ++row) {
-    let rowCells: Cell[] = []
+    let rowCells: CellDto[] = []
     for (var col = 0; col < 9; ++col) {
       let index = row * 9 + col
       rowCells.push({ options: [], index: index, selected: false, areaColor: null })

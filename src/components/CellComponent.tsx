@@ -1,42 +1,47 @@
 import * as React from "react"
 import { useAppSelector } from "../store"
-import Cell from '../types/Cell'
 import { GameMode } from "../types/GameMode"
 import "./CellComponent.css"
+import Cell from "../types/Cell"
 
-const CellComponent = (props: Cell) => {
+type CellProps = {
+    cell: Cell
+}
+
+const CellComponent = (props: CellProps) => {
+    let cell = props.cell
     let gameMode = useAppSelector((state) => state.gameMode.gameMode)
-    let boxBottom = Math.floor(props.index / 9) % 3 == 2
-    let boxRight = props.index % 3 == 2
+    let boxBottom = Math.floor(cell.index / 9) % 3 == 2
+    let boxRight = cell.index % 3 == 2
 
     return (
-        <div className={`cell ${boxBottom ? "box-bottom" : ""} ${boxRight ? "box-right" : ""} gameMode${gameMode} ${props.selected ? "selected" : ""} areaColor${props.areaColor}`}
-            onClick={ (e) => select(props, gameMode) }>
-            { renderAreaValue(props) }
-            { renderCellContent(props) }
+        <div className={`cell ${boxBottom ? "box-bottom" : ""} ${boxRight ? "box-right" : ""} gameMode${gameMode} ${cell.selected ? "selected" : ""} areaColor${cell.areaColor}`}
+            onClick={ (e) => select(cell, gameMode) }>
+            { renderAreaValue(cell) }
+            { renderCellContent(cell) }
         </div>
     )
 }
 
-const renderAreaValue = (props: Cell) => {
-    if (props.areaColor) {
-        return <div className="areaValue">{props.areaValue}</div>
+const renderAreaValue = (cell: Cell) => {
+    if (cell.areaColor) {
+        return <div className="areaValue">{cell.areaValue}</div>
     }
 }
 
-const renderCellContent = (props: Cell) => {
-    let filled = props.value != null
+const renderCellContent = (cell: Cell) => {
+    let filled = cell.value != null
     if (filled) {
-        return <div className="cellValue">{props.value}</div>
+        return <div className="cellValue">{cell.value}</div>
     } else {
-        return <div className="cellOptions">{renderOptions(props)}</div>
+        return <div className="cellOptions">{renderOptions(cell)}</div>
     }
 }
 
-const renderOptions = (props: Cell) => {
+const renderOptions = (cell: Cell) => {
     return Array.from(Array(9).keys()).map(val => {
-        let active = props.options.includes(val + 1)
-        return <div className={`cellOption ${active ? "active" : "inactive"}`} key={props.index + "-" + val}>{val + 1}</div>
+        let active = cell.options.includes(val + 1)
+        return <div className={`cellOption ${active ? "active" : "inactive"}`} key={cell.index + "-" + val}>{val + 1}</div>
     })
 }
 
