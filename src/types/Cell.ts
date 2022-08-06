@@ -20,7 +20,7 @@ export default class Cell {
         this._options = cellDto.options
         this._index = cellDto.index
         this._selected = cellDto.selected
-        this._areaColor = !!cellDto.areaColor ? <Color> cellDto.areaColor : undefined
+        this._areaColor = !!cellDto.areaColor ? cellDto.areaColor as Color : undefined
         this._areaValue = cellDto.areaValue
     }
 

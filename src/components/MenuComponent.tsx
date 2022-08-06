@@ -1,12 +1,16 @@
 import * as React from 'react'
 import { AppDispatch, useAppDispatch } from '../store';
 import { setColor, setGameMode } from '../store/GameModeSlice';
+import Board from '../types/Board';
 import { Color } from '../types/Color';
+import FileManager from '../util/FileManage';
+import "./MenuComponent.css"
 import {GameMode} from "./../types/GameMode"
 
 var areaValue = 0
 var gameMode = GameMode.Setup
 var color = Color.Green
+let fileManager = new FileManager()
 
 //create your forceUpdate hook
 function useForceUpdate(){
@@ -18,7 +22,11 @@ function useForceUpdate(){
 
 var updateCallback: () => void
 
-const MenuComponent = () => {
+type MenuProps = {
+    board: Board
+}
+
+const MenuComponent = (props: MenuProps) => {
     const forceUpdate = useForceUpdate();
     updateCallback = () => {
         forceUpdate()
@@ -26,31 +34,39 @@ const MenuComponent = () => {
     const dispatch = useAppDispatch()
     return (
         <div>
-            <button onClick={save}>Save</button>
-            <button onClick={_delete}>Delete</button>
-            <button onClick={saveToFile}>Save to file</button>
-            <input type="file" id="file-selector" onChange={loadFromFile}></input>
-            <select onChange={ (e) => changeGameMode(dispatch, e) }>
-                { renderGameModeOptions() }
-            </select>
-            <select onChange={ (e) => changeColor(dispatch, e) }>
-                { renderColorOptions() }
-            </select>
-            { areaValue }
+            <div className="fileMenu">
+                <button onClick={() => save(props.board)}>Save</button>
+                <button onClick={_delete}>Delete</button>
+                <button onClick={() => saveToFile(props.board)}>Save to file</button>
+                <label htmlFor="file-selector" className="custom-file-upload">
+                    Upload file
+                </label>
+                <input type="file" id="file-selector" onChange={loadFromFile}></input>
+            </div>
+            <div>
+                <select onChange={ (e) => changeGameMode(dispatch, e) }>
+                    { renderGameModeOptions() }
+                </select>
+                <select onChange={ (e) => changeColor(dispatch, e) }>
+                    { renderColorOptions() }
+                </select>
+                { areaValue }
+            </div>
         </div>
     )
 }
 
-const save = () => {
-    document.dispatchEvent(new CustomEvent("saveBoard"))
+const save = (board: Board) => {
+    fileManager.saveToLocalStorage(board)
 }
 
 const _delete = () => {
-    document.dispatchEvent(new CustomEvent("deleteSave"))
+    fileManager.deleteLocalStorage()
+    window.location.reload()
 }
 
-const saveToFile = () => {
-    document.dispatchEvent(new CustomEvent("saveBoardToFile"))
+const saveToFile = (board: Board) => {
+    fileManager.saveToFile(board)
 }
 
 const loadFromFile = (event: any) => {
@@ -61,7 +77,9 @@ const loadFromFile = (event: any) => {
     }
     const reader = new FileReader()
     reader.addEventListener('load', (event) => {
-        document.dispatchEvent(new CustomEvent("loadBoardFromFile", { detail: event.target.result }))
+        console.log(event.target.result.toString())
+        fileManager.saveStringToLocalStorage(event.target.result.toString())
+        window.location.reload()
     })
     reader.readAsText(file);
 }
@@ -134,15 +152,9 @@ const renderColorOptions = () => {
 }
 
 const changeColor = (dispatch: AppDispatch, event: React.ChangeEvent<HTMLSelectElement>) => {
-    const _color = getColorEnum(event.currentTarget.value)
+    const _color = event.currentTarget.value as Color
     color = _color
     dispatch(setColor(color))
-    //document.dispatchEvent(new CustomEvent("colorChanged", { detail: color}))
-}
-
-const getColorEnum = (color: String) => {
-    const indexOfS = Object.values(Color).indexOf(color as unknown as Color);
-    return Object.keys(Color)[indexOfS] as Color
 }
 
 document.addEventListener("keydown", keydown)

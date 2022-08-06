@@ -3,7 +3,6 @@ import CellComponent from "./CellComponent"
 import "./BoardComponent.css"
 import { GameMode } from "../types/GameMode"
 import AreaDto from "../dto/AreaDto"
-import * as FileSaver from "file-saver"
 import Board from "../types/Board"
 import Cell from "../types/Cell"
 import Solver from "../util/Solver"
@@ -27,20 +26,6 @@ export default class BoardComponent extends React.Component <BoardComponentProps
         document.addEventListener("cellSelected", this.cellSelected)
         document.addEventListener("gameModeChanged", this.gameModeChanged)
         document.addEventListener("keydown", this.keydown)
-        document.addEventListener("saveBoard", () => {
-            localStorage.setItem("board", JSON.stringify(this.board.toDto()))
-        })
-        document.addEventListener("deleteSave", () => {
-            localStorage.removeItem("board")
-            window.location.reload()
-        })
-        document.addEventListener("saveBoardToFile", () => {
-            FileSaver.saveAs(new File([JSON.stringify(this.board.toDto())], "sudoku.json", {type: "text/plain;charset=utf-8"}))
-        })
-        document.addEventListener("loadBoardFromFile", (event: CustomEvent) => {
-            localStorage.setItem("board", event.detail)
-            window.location.reload()
-        })
         document.addEventListener("createArea", (event: CustomEvent) => {
             const color = event.detail.color
             const value = event.detail.value
@@ -133,7 +118,7 @@ export default class BoardComponent extends React.Component <BoardComponentProps
     renderCells() {
         return this.board.cells.map(row => {
             return row.map(cell => {
-                return <CellComponent cell={cell} />
+                return <CellComponent cell={cell} key={cell.index} />
             })
         }).flat()
     }

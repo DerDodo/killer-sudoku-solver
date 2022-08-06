@@ -54,8 +54,8 @@
 
 .cellOptions {
     display: grid;
-    grid-template-columns: repeat(3, 24%);
-    grid-template-rows: repeat(3, 24%);
+    grid-template-columns: repeat(3, 33%);
+    grid-template-rows: repeat(3, 33%);
     font-size: 0.5em;
     text-align: center;
     line-height: 100%;
