@@ -1,8 +1,8 @@
 import * as React from "react"
-import { store, useAppSelector } from "../store"
+import { store } from "../store"
 import "./CellComponent.css"
 import Cell from "../types/Cell"
-import { selectCell } from "../store/GameSlice"
+import { getGameMode, selectCell } from "../store/GameSlice"
 
 type CellProps = {
     cell: Cell
@@ -10,12 +10,11 @@ type CellProps = {
 
 const CellComponent = (props: CellProps) => {
     const cell = props.cell
-    const gameMode = useAppSelector((state) => state.game.gameMode)
     const boxBottom = Math.floor(cell.index / 9) % 3 == 2
     const boxRight = cell.index % 3 == 2
 
     return (
-        <div className={`cell ${boxBottom ? "box-bottom" : ""} ${boxRight ? "box-right" : ""} gameMode${gameMode} ${cell.selected ? "selected" : ""} areaColor${cell.areaColor}`}
+        <div className={`cell ${boxBottom ? "box-bottom" : ""} ${boxRight ? "box-right" : ""} gameMode${getGameMode()} ${cell.selected ? "selected" : ""} areaColor${cell.areaColor}`}
             onClick={ () => select(cell) }>
             { renderAreaValue(cell) }
             { renderCellContent(cell) }
