@@ -25,7 +25,7 @@ export default class FileManager {
     }
 
     public loadInitialBoard(): Board {
-        let save = localStorage.getItem(FileManager.LOCAL_STORAGE_ID)
+        const save = localStorage.getItem(FileManager.LOCAL_STORAGE_ID)
 
         if (save) {
           return new Board(JSON.parse(save) as BoardDto)
@@ -35,11 +35,11 @@ export default class FileManager {
     }
 
     private initCells(): CellDto[][] {
-      let cells: CellDto[][] = []
-      for (var row = 0; row < 9; ++row) {
-        let rowCells: CellDto[] = []
-        for (var col = 0; col < 9; ++col) {
-          let index = row * 9 + col
+      const cells: CellDto[][] = []
+      for (let row = 0; row < 9; ++row) {
+        const rowCells: CellDto[] = []
+        for (let col = 0; col < 9; ++col) {
+          const index = row * 9 + col
           rowCells.push({ options: [], index: index, selected: false, areaColor: null })
         }
         cells.push(rowCells)

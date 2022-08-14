@@ -28,7 +28,7 @@ export default class Board {
     }
 
     public createArea(areaDto: AreaDto) {
-        let area = new Area(this, areaDto)
+        const area = new Area(this, areaDto)
         this._areas.push(area)
             
         const topLeft = findTopLeftCell(area.cells)
@@ -52,7 +52,7 @@ export default class Board {
 
     public getCols(): Cell[][] {
         const cols: Cell[][] = []
-        for (var col = 0; col < 9; ++col) {
+        for (let col = 0; col < 9; ++col) {
             cols.push(this.getCol(col))
         }
         return cols
@@ -60,8 +60,8 @@ export default class Board {
 
     getBoxes(): Cell[][] {
         const boxes: Cell[][] = []
-        for (var boxX = 0; boxX < 3; ++boxX) {
-            for (var boxY = 0; boxY < 3; ++boxY) {
+        for (let boxX = 0; boxX < 3; ++boxX) {
+            for (let boxY = 0; boxY < 3; ++boxY) {
                 boxes.push(this.getBoxByCoordinates(boxY * 3, boxX * 3))
             }
         }

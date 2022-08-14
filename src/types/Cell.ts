@@ -20,12 +20,16 @@ export default class Cell {
         this._options = cellDto.options
         this._index = cellDto.index
         this._selected = cellDto.selected
-        this._areaColor = !!cellDto.areaColor ? cellDto.areaColor as Color : undefined
+        this._areaColor = cellDto.areaColor ? cellDto.areaColor as Color : undefined
         this._areaValue = cellDto.areaValue
     }
 
     public get value(): number | undefined {
         return this._value
+    }
+
+    public set value(value: number) {
+        this._value = value
     }
 
     public get options(): number[] {
@@ -40,24 +44,20 @@ export default class Cell {
         return this._selected
     }
 
-    public get areaColor(): Color | undefined {
-        return this._areaColor
-    }
-
-    public get areaValue(): number | undefined {
-        return this._areaValue
-    }
-
-    public set value(value: number) {
-        this._value = value
-    }
-
     public set selected(isSelected: boolean) {
         this._selected = isSelected
     }
 
+    public get areaColor(): Color | undefined {
+        return this._areaColor
+    }
+
     public set areaColor(areaColor: Color) {
         this._areaColor = areaColor
+    }
+
+    public get areaValue(): number | undefined {
+        return this._areaValue
     }
 
     public set areaValue(areaValue: number) {

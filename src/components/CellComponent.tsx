@@ -1,22 +1,22 @@
 import * as React from "react"
-import { useAppSelector } from "../store"
-import { GameMode } from "../types/GameMode"
+import { store, useAppSelector } from "../store"
 import "./CellComponent.css"
 import Cell from "../types/Cell"
+import { selectCell } from "../store/GameSlice"
 
 type CellProps = {
     cell: Cell
 }
 
 const CellComponent = (props: CellProps) => {
-    let cell = props.cell
-    let gameMode = useAppSelector((state) => state.gameMode.gameMode)
-    let boxBottom = Math.floor(cell.index / 9) % 3 == 2
-    let boxRight = cell.index % 3 == 2
+    const cell = props.cell
+    const gameMode = useAppSelector((state) => state.game.gameMode)
+    const boxBottom = Math.floor(cell.index / 9) % 3 == 2
+    const boxRight = cell.index % 3 == 2
 
     return (
         <div className={`cell ${boxBottom ? "box-bottom" : ""} ${boxRight ? "box-right" : ""} gameMode${gameMode} ${cell.selected ? "selected" : ""} areaColor${cell.areaColor}`}
-            onClick={ (e) => select(cell, gameMode) }>
+            onClick={ () => select(cell) }>
             { renderAreaValue(cell) }
             { renderCellContent(cell) }
         </div>
@@ -30,7 +30,7 @@ const renderAreaValue = (cell: Cell) => {
 }
 
 const renderCellContent = (cell: Cell) => {
-    let filled = cell.value != null
+    const filled = cell.value != null
     if (filled) {
         return <div className="cellValue">{cell.value}</div>
     } else {
@@ -40,13 +40,13 @@ const renderCellContent = (cell: Cell) => {
 
 const renderOptions = (cell: Cell) => {
     return Array.from(Array(9).keys()).map(val => {
-        let active = cell.options.includes(val + 1)
+        const active = cell.options.includes(val + 1)
         return <div className={`cellOption ${active ? "active" : "inactive"}`} key={cell.index + "-" + val}>{val + 1}</div>
     })
 }
 
-const select = (cell: Cell, gameMode: GameMode) => {
-    document.dispatchEvent(new CustomEvent('cellSelected', { detail: { gameMode: gameMode, cell: cell } }))
+const select = (cell: Cell) => {
+    store.dispatch(selectCell(cell.index))
 }
 
 export default CellComponent

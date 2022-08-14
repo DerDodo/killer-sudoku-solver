@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
-import gameModeSlice from './store/GameModeSlice'
+import gameSlice from './store/GameSlice'
 
 export const store = configureStore({
   reducer: {
-    gameMode: gameModeSlice
+    game: gameSlice
   },
 })
 

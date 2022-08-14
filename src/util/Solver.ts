@@ -12,8 +12,8 @@ export default class Solver {
     }
     
     public solve() {
-        var prevNumFilledCells = 0
-        var newNumFilledCells = 0
+        let prevNumFilledCells = 0
+        let newNumFilledCells = 0
         do {
             prevNumFilledCells = this.calcNumFilledCells()
             this.completeSingleMissingValues()
@@ -26,7 +26,7 @@ export default class Solver {
     }
 
     completeSingleMissingValues() {
-        var changed = false
+        let changed = false
         do {
             changed = false
             if (this.completeRows()) changed = true
@@ -37,7 +37,7 @@ export default class Solver {
     }
 
     completeAreas(): boolean {
-        var success = false
+        let success = false
         this.board.areas.forEach((area => {
             const cells = area.cells
             if (this.isOnlyOneValueMissing(cells)) {
@@ -52,7 +52,7 @@ export default class Solver {
     }
 
     completeRows(): boolean {
-        var success = false
+        let success = false
         this.board.getRows().forEach((row => {
             if (this.isOnlyOneValueMissing(row)) {
                 this.fillSingleMissingCell(row, this.findMissingValue(row))
@@ -63,7 +63,7 @@ export default class Solver {
     }
 
     completeColumns(): boolean {
-        var success = false
+        let success = false
         this.board.getCols().forEach((col => {
             if (this.isOnlyOneValueMissing(col)) {
                 this.fillSingleMissingCell(col, this.findMissingValue(col))
@@ -74,7 +74,7 @@ export default class Solver {
     }
 
     completeBoxes(): boolean {
-        var success = false
+        let success = false
         this.board.getBoxes().forEach((box => {
             if (this.isOnlyOneValueMissing(box)) {
                 this.fillSingleMissingCell(box, this.findMissingValue(box))
@@ -104,8 +104,8 @@ export default class Solver {
 
     calcOptions() {
         this.fillAllOptions()
-        var prevNumOptions = 0
-        var newNumOptions = 0
+        let prevNumOptions = 0
+        let newNumOptions = 0
         do {
             prevNumOptions = this.sumNumOptions()
             this.reduceDirectOptions()
@@ -134,8 +134,8 @@ export default class Solver {
     }
 
     reduceDirectOptions() {
-        for (var row = 0; row < 9; ++row) {
-            for (var col = 0; col < 9; ++col) {
+        for (let row = 0; row < 9; ++row) {
+            for (let col = 0; col < 9; ++col) {
                 const filledCell = this.board.cells[row][col]
                 if (filledCell.value) {
                     this.board.getRow(row).forEach(cell => cell.removeOption(filledCell.value))
@@ -153,14 +153,14 @@ export default class Solver {
                 const cells = area.cells
                 const missingValues = this.getMissingValues(cells)
                 const missingCells = cells.filter(cell => !cell.value)
-                var minValue = 0
-                var maxValue = 0
-                for (var i = 0; i < missingCells.length - 1; ++i) {
+                let minValue = 0
+                let maxValue = 0
+                for (let i = 0; i < missingCells.length - 1; ++i) {
                     minValue += missingValues[i]
                     maxValue += missingValues[missingValues.length - i - 1]
                 }
 
-                for (var i = 0; i < missingValues.length - missingCells.length + 1; ++i) {
+                for (let i = 0; i < missingValues.length - missingCells.length + 1; ++i) {
                     if (minValue + missingValues[missingValues.length - i] > remainingAreaValue) {
                         missingCells.forEach(cell => cell.removeOption(missingValues[missingValues.length - i]))
                     }
@@ -211,7 +211,7 @@ export default class Solver {
         const emptyCells = cells.filter(cell => !cell.value)
         emptyCells.forEach(cell => {
             const numOptions = cell.options.length
-            var subOptions = 0
+            let subOptions = 0
             const equalCells: Cell[] = []
             emptyCells.filter(otherCell => otherCell.options.length <= numOptions).forEach(comparisonCell => {
                 if (isSubArray(cell.options, comparisonCell.options)) {
@@ -236,7 +236,7 @@ export default class Solver {
             const remainingValue = area.getRemainingValue()
             if (emptyCells.length > 1) {
                 emptyCells.forEach(cell => {
-                    let otherCells = emptyCells.filter(c => c.index != cell.index)
+                    const otherCells = emptyCells.filter(c => c.index != cell.index)
                     cell.options.forEach(option => {
                         if (!this.canSumUpTo(otherCells, remainingValue - option, [option])) {
                             cell.removeOption(option)
@@ -251,11 +251,11 @@ export default class Solver {
         if (cells.length == 1) {
             return cells[0].options.includes(targetValue) && !forbiddenOptions.includes(targetValue)
         } else {
-            for (let cell of cells) {
-                let otherCells = cells.filter(c => c.index != cell.index)
-                for (let option of cell.options) {
+            for (const cell of cells) {
+                const otherCells = cells.filter(c => c.index != cell.index)
+                for (const option of cell.options) {
                     if (!forbiddenOptions.includes(option)) {
-                        let forbiddenOptionsCopy = [...forbiddenOptions, option]
+                        const forbiddenOptionsCopy = [...forbiddenOptions, option]
                         if (this.canSumUpTo(otherCells, targetValue - option, forbiddenOptionsCopy)) {
                             return true
                         }
@@ -298,7 +298,7 @@ export default class Solver {
         const filledValues = cells.map(cell => cell.value)
         const emptyCells = cells.filter(cell => !cell.value)
         numbers1to9().filter(val => !filledValues.includes(val)).forEach(val => {
-            var numOptions = emptyCells.filter(cell => cell.options.includes(val)).length
+            const numOptions = emptyCells.filter(cell => cell.options.includes(val)).length
             if (numOptions == 1) {
                 cells.find(cell => cell.options.includes(val)).value = val
             }
@@ -311,8 +311,8 @@ export default class Solver {
             const emptyCells = areaCells.filter(cell => !cell.value)
             const remainingValue = area.getRemainingValue()
             const optionSubgroups = this.findOptionSubgroups(area)
-            var subgroupsValue = 0
-            var subgroupsNumCells = 0
+            let subgroupsValue = 0
+            let subgroupsNumCells = 0
             optionSubgroups.forEach(subgroup => {
                 subgroup.forEach(val => {
                     subgroupsNumCells += 1
@@ -331,7 +331,7 @@ export default class Solver {
     findOptionSubgroups(area: Area): number[][] {
         const areaCells = area.cells
         const emptyCells = areaCells.filter(cell => !cell.value)
-        let optionSubgroups: number[][] = []
+        const optionSubgroups: number[][] = []
         emptyCells.forEach(cell => {
             if (emptyCells.filter(otherCell => isEqualArray(otherCell.options, cell.options)).length == cell.options.length) {
                 if (!optionSubgroups.find(options => isEqualArray(options, cell.options))) {
