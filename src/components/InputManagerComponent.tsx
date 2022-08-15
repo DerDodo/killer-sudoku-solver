@@ -1,8 +1,7 @@
 import { Component, ReactNode } from "react"
-import { store } from "../store"
-import { getBoard, getGameMode, setCellValue, SetCellValuePaylod } from "../store/GameSlice"
+import { getBoard, getGameMode } from "../store/GameSlice"
 import { GameMode } from "../types/GameMode"
-import { stringToNumber } from "../util/NumberUtil"
+import { isValidNumKey, stringToNumber } from "../util/NumberUtil"
 
 export default class InputManagerComponent extends Component {
     constructor(props: unknown) {
@@ -12,11 +11,10 @@ export default class InputManagerComponent extends Component {
     }
 
     keydown(event: KeyboardEvent): void {
-        const allowedKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-        if (allowedKeys.includes(event.key)) {
+        if (isValidNumKey(event)) {
             switch(getGameMode()) {
                 case GameMode.Setup:
-
+                    // Intentionally empty
                     break
                 case GameMode.Play:
                     this.enterCellValue(stringToNumber(event.key))
@@ -29,7 +27,7 @@ export default class InputManagerComponent extends Component {
         if (val) {
             const cells = getBoard().getSelectedCells()
             if (cells.length > 0) {
-                store.dispatch(setCellValue({cellId: cells[0].index, value: val} as SetCellValuePaylod))
+                cells[0].value = val
             }
         }
     }

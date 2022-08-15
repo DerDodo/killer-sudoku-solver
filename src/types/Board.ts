@@ -1,14 +1,7 @@
-import AreaDto from "../dto/AreaDto"
 import BoardDto from "../dto/BoardDto"
 import { numbers1to9 } from "../util/NumberUtil"
 import Area from "./Area"
 import Cell from "./Cell"
-
-function findTopLeftCell(cells: Cell[]): Cell {
-    return cells.reduce((prev, curr) => {
-        return prev.index < curr.index ? prev : curr
-    })
-}
 
 export default class Board {
     private _cells: Cell[][]
@@ -25,21 +18,6 @@ export default class Board {
 
     public get areas(): Area[] {
         return this._areas
-    }
-
-    public createArea(areaDto: AreaDto) {
-        const area = new Area(this, areaDto)
-        this._areas.push(area)
-            
-        const topLeft = findTopLeftCell(area.cells)
-
-        area.cells.forEach((cell) => {
-            cell.areaColor = areaDto.color
-            cell.selected = false
-            if (cell.index == topLeft.index) {
-                cell.areaValue = areaDto.value
-            }
-        })
     }
 
     public getCellById(cellId: number): Cell {
@@ -97,10 +75,6 @@ export default class Board {
             this._cells[boxY * 3 + 2][boxX * 3 + 1],
             this._cells[boxY * 3 + 2][boxX * 3 + 2],
         ]
-    }
-
-    public selectOnly(cell: Cell) {
-        this._cells.forEach(row => row.forEach(_cell => _cell.selected = _cell.index == cell.index))
     }
 
     public getSelectedCells(): Cell[] {

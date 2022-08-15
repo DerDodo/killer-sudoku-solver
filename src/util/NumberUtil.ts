@@ -16,3 +16,8 @@ export function stringToNumber(key: string): number | null {
         default: return null
     }
 }
+
+const allowedKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+export function isValidNumKey(event: KeyboardEvent): boolean {
+    return allowedKeys.includes(event.key)
+}
