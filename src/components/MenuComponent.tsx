@@ -1,28 +1,35 @@
 import * as React from 'react'
-import { store } from '../store';
-import { createArea, getBoard, getGameMode, setColor, setGameMode } from '../store/GameSlice';
+import { RootState, store } from '../store';
+import { dispatchCreateArea, getBoard, getGameMode, setGameMode } from '../store/GameSlice';
 import { Color } from '../types/Color';
 import FileManager from '../util/FileManage';
 import "./MenuComponent.css"
 import {GameMode} from "./../types/GameMode"
 import { ChangeEvent, Component } from 'react';
-import { stringToNumber } from '../util/NumberUtil';
+import { isValidNumKey, stringToNumber } from '../util/NumberUtil';
+import { connect } from 'react-redux';
 
 type MenuComponentState = {
     areaValue: number
+    color: Color
 }
 
-export default class MenuComponent extends Component<unknown, MenuComponentState> {
+type MenuComponentProps = {
+    gameMode: GameMode
+}
+
+class MenuComponent extends Component<MenuComponentProps, MenuComponentState> {
     fileManager: FileManager = new FileManager()
 
-    constructor(props: unknown) {
+    constructor(props: MenuComponentProps) {
         super(props)
         this.keydown = this.keydown.bind(this)
         this.onFileLoad = this.onFileLoad.bind(this)
         this.loadFromFile = this.loadFromFile.bind(this)
         document.addEventListener("keydown", this.keydown)
         this.state = {
-            areaValue: 0
+            areaValue: 0,
+            color: Color.Green,
         }
     }
 
@@ -39,10 +46,10 @@ export default class MenuComponent extends Component<unknown, MenuComponentState
                     <input type="file" id="file-selector" onChange={this.loadFromFile}></input>
                 </div>
                 <div>
-                    <select onChange={ (e) => this.changeGameMode(e) }>
+                    <select onChange={ (e) => this.changeGameMode(e) } value={getGameMode()}>
                         { this.renderGameModeOptions() }
                     </select>
-                    <select onChange={ (e) => this.changeColor( e) }>
+                    <select onChange={ (e) => this.changeColor( e) } value={this.state.color}>
                         { this.renderColorOptions() }
                     </select>
                     { this.state.areaValue }
@@ -76,32 +83,32 @@ export default class MenuComponent extends Component<unknown, MenuComponentState
     }
 
     onFileLoad(event: ProgressEvent<FileReader>) {
-        console.log(this)
         this.fileManager.saveStringToLocalStorage(event.target.result.toString())
         window.location.reload()
-    }
-
-    set areaValue(value: number) {
-        this.setState({
-            areaValue: value
-        })
     }
     
     keydown(event: KeyboardEvent) {
         if (event.code == "Backspace") {
             this.areaValue = Math.floor(this.state.areaValue / 10)
         } else if (event.code == "Enter") {
-            store.dispatch(createArea(this.state.areaValue))
+            dispatchCreateArea(this.state.areaValue, this.state.color)
             this.areaValue = 0
-        } else {
-            const allowedKeys = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-            if (allowedKeys.includes(event.key)) {
-                switch(getGameMode()) {
-                    case GameMode.Setup:
-                        this.areaValue = this.state.areaValue * 10 + stringToNumber(event.key)
-                        break         
-                }
+        } else if(event.code == "Space") {
+            if (getGameMode() == GameMode.Play) {
+                store.dispatch(setGameMode(GameMode.Setup))
+            } else {
+                store.dispatch(setGameMode(GameMode.Play))
             }
+        } else if(event.key == "c") {
+            switch(this.state.color) {
+                case Color.Green: this.color = Color.Yellow; break
+                case Color.Yellow: this.color = Color.Red; break
+                case Color.Red: this.color = Color.Purple; break
+                case Color.Purple: this.color = Color.Turqoise; break
+                case Color.Turqoise: this.color = Color.Green; break
+            }
+        } else if (isValidNumKey(event) && getGameMode() == GameMode.Setup) {
+            this.areaValue = this.state.areaValue * 10 + stringToNumber(event.key)
         }
     }
     
@@ -128,7 +135,28 @@ export default class MenuComponent extends Component<unknown, MenuComponentState
     }
     
     changeColor(event: React.ChangeEvent<HTMLSelectElement>) {
-        const _color = event.currentTarget.value as Color
-        store.dispatch(setColor(_color))
+        this.color = event.currentTarget.value as Color
+    }
+
+    set areaValue(value: number) {
+        this.setState(state => ({
+            ...state,
+            areaValue: value
+        }))
+    }
+
+    set color(color: Color) {
+        this.setState(state => ({
+            ...state,
+            color: color
+        }))
     }
 }
+
+function mapStateToProps(state: RootState): MenuComponentProps {
+    return { 
+        gameMode: state.game.gameMode
+    }
+}
+
+export default connect(mapStateToProps)(MenuComponent);

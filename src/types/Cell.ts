@@ -1,4 +1,5 @@
 import CellDto from "../dto/CellDto";
+import { dispatchSetCellValue } from "../store/GameSlice";
 import { numbers1to9 } from "../util/NumberUtil";
 import Board from "./Board";
 import { Color } from "./Color";
@@ -30,6 +31,7 @@ export default class Cell {
 
     public set value(value: number) {
         this._value = value
+        dispatchSetCellValue(this.index, value)
     }
 
     public get options(): number[] {

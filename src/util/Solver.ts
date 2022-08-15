@@ -14,7 +14,9 @@ export default class Solver {
     public solve() {
         let prevNumFilledCells = 0
         let newNumFilledCells = 0
+        let numLoops = 0
         do {
+            numLoops += 1
             prevNumFilledCells = this.calcNumFilledCells()
             this.completeSingleMissingValues()
             this.calcOptions()
@@ -22,18 +24,20 @@ export default class Solver {
             this.solveUniqueOptions()
             this.solveSubGroupOptionRest()
             newNumFilledCells = this.calcNumFilledCells()
-        } while(prevNumFilledCells != newNumFilledCells)
+        } while(prevNumFilledCells != newNumFilledCells && numLoops < 100)
     }
 
     completeSingleMissingValues() {
         let changed = false
+        let numLoops = 0
         do {
+            numLoops += 1
             changed = false
             if (this.completeRows()) changed = true
             if (this.completeColumns()) changed = true
             if (this.completeBoxes()) changed = true
             if (this.completeAreas()) changed = true
-        } while (changed)
+        } while (changed && numLoops < 100)
     }
 
     completeAreas(): boolean {
@@ -106,7 +110,9 @@ export default class Solver {
         this.fillAllOptions()
         let prevNumOptions = 0
         let newNumOptions = 0
+        let numLoops = 0
         do {
+            numLoops += 1
             prevNumOptions = this.sumNumOptions()
             this.reduceDirectOptions()
             this.reduceAreaOptionsLowAndHighNumbers()
@@ -114,7 +120,7 @@ export default class Solver {
             this.reduceIfClosedSubset()
             this.reduceImpossibleNumbers()
             newNumOptions = this.sumNumOptions()
-        } while(prevNumOptions != newNumOptions)
+        } while(prevNumOptions != newNumOptions && numLoops < 100)
     }
 
     sumNumOptions() {
