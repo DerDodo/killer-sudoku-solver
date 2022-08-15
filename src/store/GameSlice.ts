@@ -78,5 +78,7 @@ export const gameSlice = createSlice({
 })
 
 export const { setGameMode, setColor, setBoard, setCellValue, selectCell, createArea } = gameSlice.actions
+export function getGameMode(): GameMode { return store.getState().game.gameMode }
 export function getBoard(): Board { return new Board(store.getState().game.board) }
+export function getColor(): Color { return store.getState().game.color }
 export default gameSlice.reducer

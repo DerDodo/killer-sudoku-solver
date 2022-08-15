@@ -1,6 +1,6 @@
 import { Component, ReactNode } from "react"
 import { store } from "../store"
-import { getBoard, setCellValue, SetCellValuePaylod } from "../store/GameSlice"
+import { getBoard, getGameMode, setCellValue, SetCellValuePaylod } from "../store/GameSlice"
 import { GameMode } from "../types/GameMode"
 import { stringToNumber } from "../util/NumberUtil"
 
@@ -12,10 +12,9 @@ export default class InputManagerComponent extends Component {
     }
 
     keydown(event: KeyboardEvent): void {
-        const gameMode = store.getState().game.gameMode
         const allowedKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
         if (allowedKeys.includes(event.key)) {
-            switch(gameMode) {
+            switch(getGameMode()) {
                 case GameMode.Setup:
 
                     break
