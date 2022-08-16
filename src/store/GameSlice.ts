@@ -29,6 +29,11 @@ export interface CreateAreaPayload {
   areaValue: number
 }
 
+export interface SetOptionsPayload {
+  cellId: number
+  options: number[]
+}
+
 class CellWrapper {
   private board: BoardDto
   private cellId: number
@@ -70,6 +75,11 @@ class CellWrapper {
     const [row, col] = this.getRowAndCol()
     this.board.cells[row][col].areaValue = value
   }
+
+  set options(options: number[]) {
+    const [row, col] = this.getRowAndCol()
+    this.board.cells[row][col].options = options
+  }
 }
 
 class BoardWrapper {
@@ -102,7 +112,7 @@ class BoardWrapper {
     const selectedCellIds = this.board.cells.flat().filter(cell => cell.selected).map(cell => cell.index)
 
     if (payload.areaValue <= 0 || selectedCellIds.length == 0) {
-      return
+      return this
     }
 
     const area: AreaDto = {
@@ -122,6 +132,10 @@ class BoardWrapper {
     const topLeft = Math.min(...selectedCellIds)
     this.wrap(topLeft).areaValue = payload.areaValue
 
+    return this
+  }
+  setOptions(payload: SetOptionsPayload): BoardWrapper {
+    this.wrap(payload.cellId).options = payload.options
     return this
   }
 
@@ -164,12 +178,16 @@ export const gameSlice = createSlice({
     createArea: (state, action: PayloadAction<CreateAreaPayload>) => {
       state.board = wrap(state.board).createArea(action.payload).return()
     },
+    setOptions: (state, action: PayloadAction<SetOptionsPayload>) => {
+      state.board = wrap(state.board).setOptions(action.payload).return()
+    },
   },
 })
 
-export const { setGameMode, setBoard, setCellValue, selectCell, createArea } = gameSlice.actions
+export const { setGameMode, setBoard, setCellValue, selectCell, createArea, setOptions } = gameSlice.actions
 export function getGameMode(): GameMode { return store.getState().game.gameMode }
 export function getBoard(): Board { return new Board(store.getState().game.board) }
 export function dispatchCreateArea(areaValue: number, color: Color) { store.dispatch(createArea({ areaValue: areaValue, color: color } as CreateAreaPayload)) }
 export function dispatchSetCellValue(cellId: number, value: number) { store.dispatch(setCellValue({ cellId: cellId, value: value } as SetCellValuePaylod)) }
+export function dispatchSetOptions(cellId: number, options: number[]) { store.dispatch(setOptions({ cellId: cellId, options: options } as SetOptionsPayload)) }
 export default gameSlice.reducer

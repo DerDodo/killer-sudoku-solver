@@ -12,26 +12,6 @@
     background-color: aqua !important;
 }
 
-.cell.areaColorGreen {
-    background-color: rgb(179, 255, 103);
-}
-
-.cell.areaColorYellow {
-    background-color: rgb(255, 255, 131);
-}
-
-.cell.areaColorRed {
-    background-color: rgb(255, 148, 148);
-}
-
-.cell.areaColorPurple {
-    background-color: rgb(175, 153, 255);
-}
-
-.cell.areaColorTurqoise {
-    background-color: rgb(121, 253, 240);
-}
-
 .cell.box-bottom {
     border-bottom: 3px solid black;
 }

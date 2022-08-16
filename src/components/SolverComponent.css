@@ -1,0 +1,15 @@
+button {
+    background-color: rgb(197, 198, 206);
+    height: 100%;
+    display: inline-block;
+    border: 1px solid rgb(197, 198, 206);
+    border-radius: 0.8em;
+    margin-right: 0.3em;
+    padding: 0.2em 0.5em;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: rgb(231, 232, 241);
+}

@@ -7,4 +7,5 @@
     font-size: calc(600px/27);
     border-top: 3px solid black;
     border-left: 3px solid black;
+    margin: 0.7em;
 }

@@ -4,10 +4,22 @@
 }
 
 body, button {
-    font-size: 16px;
+    font-size: 18px;
     font-family: "Century Gothic", CenturyGothic, Geneva, AppleGothic, sans-serif;
 }
 
 body {
     background-color: rgb(100, 100, 100);
+}
+
+.sideMenu {
+    float: right;
+    width: 250px;
+    background-color: rgb(65, 65, 65);
+    border: 2px solid rgb(46, 46, 46);
+    border-right-width: 0;
+    padding: 0.5em;
+    color: rgb(197, 198, 206);
+    margin-top: 1em;
+    clear: both;
 }

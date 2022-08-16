@@ -1,4 +1,5 @@
 import * as React from 'react'
+import "./InputManagerComponent.css"
 import { Component } from 'react'
 import { connect } from 'react-redux'
 import { RootState, store } from '../store'
@@ -33,7 +34,7 @@ class InputManagerComponent extends Component<InputManagerComponentProps, InputM
         } else if (event.code == "Enter") {
             dispatchCreateArea(this.state.areaValue, this.state.color)
             this.areaValue = 0
-        } else if(event.code == "Space") {
+        } else if(event.key == "x") {
             if (getGameMode() == GameMode.Play) {
                 store.dispatch(setGameMode(GameMode.Setup))
             } else {
@@ -71,11 +72,11 @@ class InputManagerComponent extends Component<InputManagerComponentProps, InputM
     render() {
         const gameMode = getGameMode()
         return (
-            <div className={`interactionMenu gameMode${gameMode}`}>
-                <select onChange={ (e) => this.changeGameMode(e) } value={gameMode}>
+            <div className={`interactionMenu sideMenu gameMode${gameMode}`}>
+                <select onChange={ (e) => this.changeGameMode(e) } value={gameMode} id="gameModeSelect">
                     { this.renderGameModeOptions() }
                 </select>
-                <select onChange={ (e) => this.changeColor(e) } value={this.state.color}>
+                <select onChange={ (e) => this.changeColor(e) } value={this.state.color} id="colorSelect" className={`color${this.state.color}`}>
                     { this.renderColorOptions() }
                 </select>
                 { this.state.areaValue }
@@ -101,7 +102,7 @@ class InputManagerComponent extends Component<InputManagerComponentProps, InputM
     
     renderColorOptions() {
         return (Object.keys(Color) as Array<keyof typeof Color>).map((key) => {
-            return <option value={key} key={key}>{Color[key]}</option>
+            return <option value={key} key={key} className={`color${key}`}>{Color[key]}</option>
         })
     }
     

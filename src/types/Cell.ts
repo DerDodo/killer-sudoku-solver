@@ -1,5 +1,5 @@
 import CellDto from "../dto/CellDto";
-import { dispatchSetCellValue } from "../store/GameSlice";
+import { dispatchSetCellValue, dispatchSetOptions } from "../store/GameSlice";
 import { numbers1to9 } from "../util/NumberUtil";
 import Board from "./Board";
 import { Color } from "./Color";
@@ -72,14 +72,17 @@ export default class Cell {
 
     public clearOptions(): void {
         this._options = []
+        dispatchSetOptions(this._index, this._options)
     }
 
     public setOptions1To9(): void {
         this._options = numbers1to9()
+        dispatchSetOptions(this._index, this._options)
     }
 
     public removeOption(option: number): void {
         this._options = this._options.filter(o => o != option)
+        dispatchSetOptions(this._index, this._options)
     }
 
     public toDto(): CellDto {

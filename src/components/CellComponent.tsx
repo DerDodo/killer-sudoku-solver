@@ -14,7 +14,7 @@ const CellComponent = (props: CellProps) => {
     const boxRight = cell.index % 3 == 2
 
     return (
-        <div className={`cell ${boxBottom ? "box-bottom" : ""} ${boxRight ? "box-right" : ""} gameMode${getGameMode()} ${cell.selected ? "selected" : ""} areaColor${cell.areaColor}`}
+        <div className={`cell ${boxBottom ? "box-bottom" : ""} ${boxRight ? "box-right" : ""} gameMode${getGameMode()} ${cell.selected ? "selected" : ""} color${cell.areaColor}`}
             onClick={ () => select(cell) }>
             { renderAreaValue(cell) }
             { renderCellContent(cell) }
