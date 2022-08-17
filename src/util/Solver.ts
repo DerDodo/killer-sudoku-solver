@@ -119,6 +119,7 @@ export default class Solver {
             this.reduceTwoCellAreas()
             this.reduceIfClosedSubset()
             this.reduceImpossibleNumbers()
+            this.reduceMustHaveNumbersInAreas()
             newNumOptions = this.sumNumOptions()
         } while(prevNumOptions != newNumOptions && numLoops < 100)
     }
@@ -251,6 +252,81 @@ export default class Solver {
                 })
             }
         })
+    }
+
+    reduceMustHaveNumbersInAreas() {
+        this.board.areas.forEach(area => {
+            const emptyCells = area.cells.filter(cell => !cell.value)
+            if (emptyCells.length > 0) {
+                const remainingValue = area.getRemainingValue()
+                const allSolutions = this.getSolutionsForArea(remainingValue, emptyCells)
+                this.removeMustHaveOptionsInArea(emptyCells, allSolutions)
+                this.removeUniqueOptionsInArea(emptyCells, allSolutions)
+            }
+        })
+    }
+
+    removeMustHaveOptionsInArea(emptyCells: Cell[], allSolutions: number[][]) {
+        const allCellsInSameRow = emptyCells.filter(cell => cell.row == emptyCells[0].row).length == emptyCells.length
+        const allCellsInSameCol = emptyCells.filter(cell => cell.col == emptyCells[0].col).length == emptyCells.length
+        const allCellsInSameBox = emptyCells.filter(cell => cell.boxId == emptyCells[0].boxId).length == emptyCells.length
+        if (allCellsInSameRow || allCellsInSameCol || allCellsInSameBox) {
+            numbers1to9().forEach(number => {
+                if (allSolutions.filter(solution => solution.includes(number)).length == allSolutions.length) {
+                    if (allCellsInSameRow) {
+                        this.removeOptionFromCells(this.board.getRow(emptyCells[0].row), emptyCells, number)
+                    }
+                    if (allCellsInSameCol) {
+                        this.removeOptionFromCells(this.board.getCol(emptyCells[0].col), emptyCells, number)
+                    }
+                    if (allCellsInSameBox) {
+                        this.removeOptionFromCells(this.board.getBoxByCell(emptyCells[0]), emptyCells, number)
+                    }
+                }
+            })
+        }
+    }
+
+    removeUniqueOptionsInArea(emptyCells: Cell[], allSolutions: number[][]) {
+        for (let i = 0; i < emptyCells.length; ++i) {
+            const isUnique = allSolutions.filter(solution => solution[i] == allSolutions[0][i]).length == allSolutions.length
+            if (isUnique) {
+                emptyCells[i].value = allSolutions[0][i]
+            }
+        }
+    }
+
+    removeOptionFromCells(cells: Cell[], exceptions: Cell[], option: number) {
+        cells.filter(cell => !exceptions.map(exception => exception.index).includes(cell.index)).forEach(cell => {
+            cell.removeOption(option)
+        })
+    }
+
+    getSolutionsForArea(targetValue: number, cells: Cell[], forbiddenNumbers: number[] = []): number[][] {
+        if (cells.length == 1) {
+            if (cells[0].options.includes(targetValue) && !forbiddenNumbers.includes(targetValue)) {
+                return [[targetValue]]
+            } else {
+                return []
+            }
+        } else {
+            const cell = cells[0]
+            const solutions: number[][] = []
+            for (const option of cell.options) {
+                if (!forbiddenNumbers.includes(option)) {
+                    const newTargetValue = targetValue - option
+                    if (newTargetValue <= 0) {
+                        continue
+                    } else {
+                        const solutionsForOption = this.getSolutionsForArea(newTargetValue, cells.slice(1), [option, ...forbiddenNumbers])
+                        for (const solution of solutionsForOption) {
+                            solutions.push([option, ...solution])
+                        }
+                    }
+                }
+            }
+            return solutions
+        }
     }
 
     canSumUpTo(cells: Cell[], targetValue: number, forbiddenOptions: number[]): boolean {
