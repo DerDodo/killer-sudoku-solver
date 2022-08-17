@@ -48,7 +48,7 @@ class InputManagerComponent extends Component<InputManagerComponentProps, InputM
                 case Color.Purple: this.color = Color.Turqoise; break
                 case Color.Turqoise: this.color = Color.Green; break
             }
-        } else if (isValidNumKey(event) && getGameMode() == GameMode.Setup) {
+        } else if (isValidNumKey(event)) {
             switch(getGameMode()) {
                 case GameMode.Setup:
                     this.areaValue = this.state.areaValue * 10 + stringToNumber(event.key)

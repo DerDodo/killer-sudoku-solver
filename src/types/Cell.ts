@@ -65,6 +65,20 @@ export default class Cell {
     public set areaValue(areaValue: number) {
         this._areaValue = areaValue
     }
+
+    public get row(): number {
+        return Math.floor(this._index / 9)
+    }
+
+    public get col(): number {
+        return this._index % 9
+    }
+
+    public get boxId(): number {
+        const boxX = Math.floor(this.col / 3)
+        const boxY = Math.floor(this.row / 3)
+        return boxY * 3 + boxX
+    }
     
     public toggleSelect() {
         this._selected = !this._selected
