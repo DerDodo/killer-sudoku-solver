@@ -34,7 +34,7 @@ class BoardComponent extends Component<BoardComponentProps, unknown> {
 
 function mapStateToProps(state: RootState): BoardComponentProps {
     return { 
-        board: new Board(state.game.board)
+        board: new Board(state.game.board, true)
     }
 }
 

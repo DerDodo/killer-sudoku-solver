@@ -28,9 +28,9 @@ export default class FileManager {
         const save = localStorage.getItem(FileManager.LOCAL_STORAGE_ID)
 
         if (save) {
-          return new Board(JSON.parse(save) as BoardDto)
+          return new Board(JSON.parse(save) as BoardDto, true)
         } else {
-          return new Board({ cells: this.initCells(), areas: [] })
+          return new Board({ cells: this.initCells(), areas: [] }, true)
         }
     }
 

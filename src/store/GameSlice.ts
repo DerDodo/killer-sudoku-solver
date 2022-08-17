@@ -5,7 +5,7 @@ import { store } from '../store'
 import Board from '../types/Board'
 import { Color } from '../types/Color'
 import { GameMode } from '../types/GameMode'
-import FileManager from '../util/FileManage'
+import FileManager from '../util/FileManager'
 
 interface Game {
   gameMode: GameMode,
@@ -186,7 +186,7 @@ export const gameSlice = createSlice({
 
 export const { setGameMode, setBoard, setCellValue, selectCell, createArea, setOptions } = gameSlice.actions
 export function getGameMode(): GameMode { return store.getState().game.gameMode }
-export function getBoard(): Board { return new Board(store.getState().game.board) }
+export function getBoard(): Board { return new Board(store.getState().game.board, true) }
 export function dispatchCreateArea(areaValue: number, color: Color) { store.dispatch(createArea({ areaValue: areaValue, color: color } as CreateAreaPayload)) }
 export function dispatchSetCellValue(cellId: number, value: number) { store.dispatch(setCellValue({ cellId: cellId, value: value } as SetCellValuePaylod)) }
 export function dispatchSetOptions(cellId: number, options: number[]) { store.dispatch(setOptions({ cellId: cellId, options: options } as SetOptionsPayload)) }

@@ -6,6 +6,7 @@ import { Color } from "./Color";
 
 export default class Cell {
     private _board: Board
+    private _dispatchActions: boolean
 
     private _value?: number
     private _options: number[]
@@ -14,8 +15,9 @@ export default class Cell {
     private _areaColor?: Color
     private _areaValue?: number
 
-    constructor(board: Board, cellDto: CellDto) {
+    constructor(board: Board, cellDto: CellDto, dispatchActions: boolean) {
         this._board = board
+        this._dispatchActions = dispatchActions
 
         this._value = cellDto.value
         this._options = cellDto.options
@@ -31,7 +33,9 @@ export default class Cell {
 
     public set value(value: number) {
         this._value = value
-        dispatchSetCellValue(this.index, value)
+        if (this._dispatchActions) {
+            dispatchSetCellValue(this.index, value)
+        }
     }
 
     public get options(): number[] {
@@ -86,17 +90,23 @@ export default class Cell {
 
     public clearOptions(): void {
         this._options = []
-        dispatchSetOptions(this._index, this._options)
+        if (this._dispatchActions) {
+            dispatchSetOptions(this._index, this._options)
+        }
     }
 
     public setOptions1To9(): void {
         this._options = numbers1to9()
-        dispatchSetOptions(this._index, this._options)
+        if (this._dispatchActions) {
+            dispatchSetOptions(this._index, this._options)
+        }
     }
 
     public removeOption(option: number): void {
         this._options = this._options.filter(o => o != option)
-        dispatchSetOptions(this._index, this._options)
+        if (this._dispatchActions) {
+            dispatchSetOptions(this._index, this._options)
+        }
     }
 
     public toDto(): CellDto {

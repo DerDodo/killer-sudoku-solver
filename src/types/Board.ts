@@ -7,8 +7,8 @@ export default class Board {
     private _cells: Cell[][]
     private _areas: Area[]
 
-    constructor(boardDto: BoardDto) {
-        this._cells = boardDto.cells.map(dtos => dtos.map(dto => new Cell(this, dto)))
+    constructor(boardDto: BoardDto, dispatchActions: boolean) {
+        this._cells = boardDto.cells.map(dtos => dtos.map(dto => new Cell(this, dto, dispatchActions)))
         this._areas = boardDto.areas.map(dto => new Area(this, dto))
     }
 

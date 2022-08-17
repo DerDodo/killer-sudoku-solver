@@ -4,6 +4,13 @@ import Cell from "../types/Cell";
 import { isEqualArray, isSubArray } from "./ArrayUtil";
 import { numbers1to9 } from "./NumberUtil";
 
+class UnsolvableError extends Error {
+    constructor(msg: string) {
+        super(msg);
+        Object.setPrototypeOf(this, UnsolvableError.prototype);
+    }
+}
+
 export default class Solver {
     private board: Board
 
@@ -11,7 +18,7 @@ export default class Solver {
         this.board = board
     }
     
-    public solve() {
+    public solve(bruteForceDepth = 5) {
         let prevNumFilledCells = 0
         let newNumFilledCells = 0
         let numLoops = 0
@@ -25,6 +32,46 @@ export default class Solver {
             this.solveSubGroupOptionRest()
             newNumFilledCells = this.calcNumFilledCells()
         } while(prevNumFilledCells != newNumFilledCells && numLoops < 100)
+
+        if (!this.isDone()) {
+            this.bruteForce(bruteForceDepth)
+        }
+    }
+
+    bruteForce(bruteForceDepth: number) {
+        if (bruteForceDepth > 0) {
+            const testCell = this.findBruteForceTestCell()
+            if (testCell !== undefined) {
+                for (const option of testCell.options) {
+                    const boardCopy = new Board(this.board.toDto(), false)
+                    boardCopy.getCellById(testCell.index).value = option
+                    const solver = new Solver(boardCopy)
+                    try {
+                        solver.solve(bruteForceDepth - 1)
+                        this.copyCells(boardCopy)
+                    } catch(e) {
+                        // Do nothing. Try next option
+                    }
+                }
+            }
+        }
+    }
+
+    findBruteForceTestCell(): Cell | undefined {
+        let testCell = this.board.cells.flat().find(cell => cell.options.length == 2)
+        if (testCell !== undefined) {
+            testCell = this.board.cells.flat().find(cell => cell.options.length == 3)
+        }
+        if (testCell !== undefined) {
+            testCell = this.board.cells.flat().find(cell => cell.options.length == 4)
+        }
+        return testCell
+    }
+
+    copyCells(otherBoard: Board) {
+        this.board.cells.flat().forEach(cell => {
+            cell.value = otherBoard.getCellById(cell.index).value
+        })
     }
 
     completeSingleMissingValues() {
@@ -260,8 +307,12 @@ export default class Solver {
             if (emptyCells.length > 0) {
                 const remainingValue = area.getRemainingValue()
                 const allSolutions = this.getSolutionsForArea(remainingValue, emptyCells)
-                this.removeMustHaveOptionsInArea(emptyCells, allSolutions)
-                this.removeUniqueOptionsInArea(emptyCells, allSolutions)
+                if (allSolutions.length != 0) {
+                    this.removeMustHaveOptionsInArea(emptyCells, allSolutions)
+                    this.removeUniqueOptionsInArea(emptyCells, allSolutions)
+                } else {
+                    throw new UnsolvableError("Couldn't calculate a valid solution for area")
+                }
             }
         })
     }
@@ -426,5 +477,9 @@ export default class Solver {
 
     calcNumFilledCells(): number {
         return this.board.cells.flat().filter(cell => !!cell.value).length
+    }
+
+    isDone(): boolean {
+        return this.board.cells.flat().find(cell => !cell.value) === undefined
     }
 }

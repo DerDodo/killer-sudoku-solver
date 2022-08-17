@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Component } from 'react'
 import { connect } from 'react-redux'
 import { RootState } from '../store'
+import { TailSpin } from  'react-loader-spinner'
 import Board from '../types/Board'
 import Solver from '../util/Solver'
 import "./SolverComponent.css"
@@ -33,7 +34,7 @@ class SolverComponent extends Component<SolverComponentProps, never> {
 
 function mapStateToProps(state: RootState): SolverComponentProps {
     return { 
-        board: new Board(state.game.board)
+        board: new Board(state.game.board, true)
     }
 }
 

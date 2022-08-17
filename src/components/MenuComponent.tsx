@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { getBoard } from '../store/GameSlice';
-import FileManager from '../util/FileManage';
+import FileManager from '../util/FileManager';
 import "./MenuComponent.css"
 import { ChangeEvent, Component } from 'react';
 
