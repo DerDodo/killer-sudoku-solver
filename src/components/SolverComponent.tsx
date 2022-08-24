@@ -2,7 +2,6 @@ import * as React from 'react'
 import { Component } from 'react'
 import { connect } from 'react-redux'
 import { RootState } from '../store'
-import { TailSpin } from  'react-loader-spinner'
 import Board from '../types/Board'
 import Solver from '../util/Solver'
 import "./SolverComponent.css"
@@ -11,24 +10,54 @@ type SolverComponentProps = {
     board: Board
 }
 
-class SolverComponent extends Component<SolverComponentProps, never> {
+type SolverComponentState = {
+    solving: boolean
+}
+
+class SolverComponent extends Component<SolverComponentProps, SolverComponentState> {
+
     constructor (props: SolverComponentProps) {
         super(props)
-        this.solve = this.solve.bind(this)
+        this.startSolve = this.startSolve.bind(this)
+        this.state = {
+            solving: false
+        }
     }
 
     render() {
         return (
             <div className="sideMenu">
-                <button onClick={ this.solve }>Solve</button>
+                <button onClick={ this.startSolve } disabled={ this.state.solving }>Solve</button>
+                { this.renderIndicator() }
             </div>
         )
     }
 
-    solve() {
-        const solver = new Solver(this.props.board)
-        solver.solve()
-        this.forceUpdate()
+    renderIndicator() {
+        if (this.state.solving) {
+            return (
+                <span>
+                    <span>Solving...</span>
+                </span>
+            )
+        } else  {
+            return null
+        }
+    }
+
+    startSolve() {
+        this.setSolving(true)
+        window.setTimeout(() => {
+            const solver = new Solver(this.props.board)
+            solver.solve()
+            this.setSolving(false)
+        }, 10)
+    }
+
+    setSolving(solving: boolean) {
+        this.setState({
+            solving: solving
+        })
     }
 }
 
