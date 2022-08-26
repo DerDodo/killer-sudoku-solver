@@ -49,12 +49,15 @@ class InputManagerComponent extends Component<InputManagerComponentProps, InputM
                 case Color.Turqoise: this.color = Color.Green; break
             }
         } else if (isValidNumKey(event)) {
+            const number = stringToNumber(event.key)
             switch(getGameMode()) {
                 case GameMode.Setup:
-                    this.areaValue = this.state.areaValue * 10 + stringToNumber(event.key)
+                    this.areaValue = this.state.areaValue * 10 + number
                     break
                 case GameMode.Play:
-                    this.enterCellValue(stringToNumber(event.key))
+                    if (number != 0) {
+                        this.enterCellValue(number)
+                    }
                     break            
             }
         }

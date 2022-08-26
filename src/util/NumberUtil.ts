@@ -4,6 +4,7 @@ export function numbers1to9(): number[] {
 
 export function stringToNumber(key: string): number | null {
     switch(key) {
+        case "0": return 0
         case "1": return 1
         case "2": return 2
         case "3": return 3
@@ -17,7 +18,7 @@ export function stringToNumber(key: string): number | null {
     }
 }
 
-const allowedKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+const allowedKeys = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 export function isValidNumKey(event: KeyboardEvent): boolean {
     return allowedKeys.includes(event.key)
 }
