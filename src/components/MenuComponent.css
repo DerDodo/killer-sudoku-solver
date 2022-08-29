@@ -21,6 +21,6 @@
     background-color: rgb(107, 107, 112);
 }
 
-#file-selector {
+#file-selector, #screenshot-selector {
     display: none;
 }

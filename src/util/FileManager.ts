@@ -12,6 +12,10 @@ export default class FileManager {
         localStorage.setItem(FileManager.LOCAL_STORAGE_ID, JSON.stringify(board.toDto()))
     }
 
+    public saveDtoToLocalStorage(board: BoardDto): void {
+        localStorage.setItem(FileManager.LOCAL_STORAGE_ID, JSON.stringify(board))
+    }
+
     public saveStringToLocalStorage(board: string): void {
         localStorage.setItem(FileManager.LOCAL_STORAGE_ID, board)
     }
