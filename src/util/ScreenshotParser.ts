@@ -88,7 +88,7 @@ export default class ScreenshotParser {
     numbers: number[][]
     cells: CellDto[][]
 
-    async loadFromDataUrl(dataUrl: string): Promise<void> {
+    async load(dataUrl: string): Promise<void> {
         this.image = await Image.load(dataUrl)
     }
 
@@ -101,9 +101,6 @@ export default class ScreenshotParser {
 
         this.numbers = this.readNumbers()
         this.cells = this.calcCells(this.numbers, this.areas)
-
-        console.log("Cells", this.cells)
-        console.log("Areas", this.areas)
 
         return { cells: this.cells, areas: this.areas}
     }
@@ -178,7 +175,6 @@ export default class ScreenshotParser {
             const areaCells = cells.flat().filter((cell) => { return cell.areaId === i })
             const cellIds = areaCells.map((cell) => cell.id)
             const areaNumber = this.readAreaNumber(areaCells[0])
-            console.log(areaCells[0], areaNumber)
             areas.push({
                 value: areaNumber,
                 cellIds: cellIds,
@@ -209,7 +205,6 @@ export default class ScreenshotParser {
     }
 
     readAreaNumber(cell: AreaCellData): number | null {
-        console.log(cell)
         const topLeft = this.getTopLeft(cell.row, cell.col)
         for (let i = 1; i <= 9; ++i) {
             if (this.isAreaNumber(topLeft, i)) {

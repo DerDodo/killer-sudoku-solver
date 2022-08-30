@@ -88,7 +88,7 @@ export default class MenuComponent extends Component {
     async onScreenshotLoad(event: ProgressEvent<FileReader>) {
         console.log("Loading successful")
         const parser = new ScreenshotParser()
-        parser.loadFromDataUrl(event.target.result as string).then(() => {
+        parser.load(event.target.result as string).then(() => {
             const board = parser.parse()
             this.fileManager.saveDtoToLocalStorage(board)
             //this.imageData = parser.getDataForImg()

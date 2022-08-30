@@ -13,6 +13,17 @@
             "runtimeArgs": [
                 "run-script", "start:dev"
             ],
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Test",
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script", "test"
+            ],
         }
     ]
 }
