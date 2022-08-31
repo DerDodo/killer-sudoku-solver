@@ -1,8 +1,8 @@
 import ScreenshotParser from "./ScreenshotParser"
 
-function testSudoku(path: string, areaValues: number[]) {
+function testSudoku(path: string, areaValues: number[]): Promise<void> {
     const parser = new ScreenshotParser()
-    parser.load(path).then(() => {
+    return parser.load(path).then(() => {
         const board = parser.parse()
         expect(board.areas.length).toBe(areaValues.length)
         for (let i = 0; i < areaValues.length; ++i) {
@@ -11,7 +11,7 @@ function testSudoku(path: string, areaValues: number[]) {
     })
 }
 
-test('sudoku 1', () => {
+test('sudoku 1', async () => {
     const areaValues = [
         20, 21, 4, 32,
         13, 2, 10,
@@ -23,10 +23,10 @@ test('sudoku 1', () => {
         13, 18, 25,
         1, 15
     ]
-    testSudoku("./src/assets/sudoku-1.jpg", areaValues)
+    await testSudoku("./src/assets/sudoku-1.jpg", areaValues)
 })
 
-test('sudoku 2', () => {
+test('sudoku 2', async () => {
     const areaValues = [
         17, 7, 14, 7, 17, 15,
         13, 17,
@@ -38,10 +38,10 @@ test('sudoku 2', () => {
         10, 12, 13,
         12, 16
     ]
-    testSudoku("./src/assets/sudoku-2.jpg", areaValues)
+    await testSudoku("./src/assets/sudoku-2.jpg", areaValues)
 })
 
-test('sudoku 3', () => {
+test('sudoku 3', async () => {
     const areaValues = [
         13, 19, 5, 22, 19,
         13, 8,
@@ -53,10 +53,10 @@ test('sudoku 3', () => {
         17, 3,
         15, 1, 15, 6
     ]
-    testSudoku("./src/assets/sudoku-3.jpg", areaValues)
+    await testSudoku("./src/assets/sudoku-3.jpg", areaValues)
 })
 
-test('sudoku 4', () => {
+test('sudoku 4', async () => {
     const areaValues = [
         15, 13, 13, 9, 13,
         9, 9, 9,
@@ -68,10 +68,10 @@ test('sudoku 4', () => {
         18, 7, 15,
         19
     ]
-    testSudoku("./src/assets/sudoku-4.jpg", areaValues)
+    await testSudoku("./src/assets/sudoku-4.jpg", areaValues)
 })
 
-test('sudoku 5', () => {
+test('sudoku 5', async () => {
     const areaValues = [
         24, 6, 7, 16, 8, 14, 8,
         16, 15,
@@ -83,10 +83,10 @@ test('sudoku 5', () => {
         14, 12, 12,
         9, 4, 5, 9
     ]
-    testSudoku("./src/assets/sudoku-5.jpg", areaValues)
+    await testSudoku("./src/assets/sudoku-5.jpg", areaValues)
 })
 
-test('sudoku 6', () => {
+test('sudoku 6', async () => {
     const areaValues = [
         17, 14, 9, 21, 4, 20,
         7, 10, 14,
@@ -98,10 +98,10 @@ test('sudoku 6', () => {
         15, 19, 6, 18,
         15, 4
     ]
-    testSudoku("./src/assets/sudoku-6.jpg", areaValues)
+    await testSudoku("./src/assets/sudoku-6.jpg", areaValues)
 })
 
-test('sudoku 7', () => {
+test('sudoku 7', async () => {
     const areaValues = [
         11, 8, 14, 11, 13, 12, 6,
         10, 17,
@@ -112,10 +112,10 @@ test('sudoku 7', () => {
         14, 9, 3, 10,
         8, 10, 24, 26
     ]
-    testSudoku("./src/assets/sudoku-7.jpg", areaValues)
+    await testSudoku("./src/assets/sudoku-7.jpg", areaValues)
 })
 
-test('sudoku 8', () => {
+test('sudoku 8', async () => {
     const areaValues = [
         6, 15, 17, 7, 6, 7,
         14, 12, 11, 18,
@@ -127,10 +127,10 @@ test('sudoku 8', () => {
         10, 15, 13, 10,
         10, 13, 5
     ]
-    testSudoku("./src/assets/sudoku-8.jpg", areaValues)
+    await testSudoku("./src/assets/sudoku-8.jpg", areaValues)
 })
 
-test('sudoku 9', () => {
+test('sudoku 9', async () => {
     const areaValues = [
         27, 6, 21, 5,
         6, 2, 12, 8, 13, 11,
@@ -142,10 +142,10 @@ test('sudoku 9', () => {
         6, 6, 24, 13, 10,
         6
     ]
-    testSudoku("./src/assets/sudoku-9.jpg", areaValues)
+    await testSudoku("./src/assets/sudoku-9.jpg", areaValues)
 })
 
-test('sudoku 10', () => {
+test('sudoku 10', async () => {
     const areaValues = [
         14, 13, 14, 3, 16,
         11, 7, 20, 13,
@@ -157,10 +157,10 @@ test('sudoku 10', () => {
         15, 4, 14, 18,
         21
     ]
-    testSudoku("./src/assets/sudoku-10.jpg", areaValues)
+    await testSudoku("./src/assets/sudoku-10.jpg", areaValues)
 })
 
-test('sudoku 11', () => {
+test('sudoku 11', async () => {
     const areaValues = [
         12, 10, 15, 7, 4, 18,
         11, 8, 17,
@@ -172,5 +172,20 @@ test('sudoku 11', () => {
         13, 5, 8, 12, 11, 11, 11,
         4
     ]
-    testSudoku("./src/assets/sudoku-11.jpg", areaValues)
+    await testSudoku("./src/assets/sudoku-11.jpg", areaValues)
+})
+
+test('sudoku 12', async () => {
+    const areaValues = [
+        18, 12, 6, 14,
+        10, 14, 23,
+        23, 7, 17, 11,
+        15, 7, 11,
+        4, 19, 12, 10, 8, 15,
+        24, 14,
+        16, 19, 4, 17,
+        19, 12, 4,
+        8, 8, 4
+    ]
+    await testSudoku("./src/assets/sudoku-12.jpg", areaValues)
 })
