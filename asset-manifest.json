@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/killer-sudoku/static/css/main.80ab13dd.css",
+    "main.js": "/killer-sudoku/static/js/main.5b48c69f.js",
+    "index.html": "/killer-sudoku/index.html",
+    "main.80ab13dd.css.map": "/killer-sudoku/static/css/main.80ab13dd.css.map",
+    "main.5b48c69f.js.map": "/killer-sudoku/static/js/main.5b48c69f.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.80ab13dd.css",
+    "static/js/main.5b48c69f.js"
+  ]
+}
