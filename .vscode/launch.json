@@ -17,6 +17,27 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Start",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": ["${workspaceFolder}/build/static/js/**/*.js"],
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script", "start"
+            ],
+        },
+        {
+          "type": "chrome",
+          "request": "launch",
+          "name": "Launch Chrome against localhost",
+          "preLaunchTask": "tsc: build - tsconfig.json",
+          "outFiles": ["${workspaceFolder}/build/static/js/**/*.js"],
+          "url": "http://localhost:3000",
+          "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Test",
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",

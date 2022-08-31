@@ -49,7 +49,11 @@ class SolverComponent extends Component<SolverComponentProps, SolverComponentSta
         this.setSolving(true)
         window.setTimeout(() => {
             const solver = new Solver(this.props.board)
-            solver.solve()
+            try {
+                solver.solve()
+            } catch(e) {
+                // Do nothing. Try next option
+            }
             this.setSolving(false)
         }, 10)
     }

@@ -42,6 +42,13 @@ export default class Cell {
         return this._options
     }
 
+    public set options(options: number[]) {
+        this._options = options
+        if (this._dispatchActions) {
+            dispatchSetOptions(this._index, this._options)
+        }
+    }
+
     public get index(): number {
         return this._index
     }

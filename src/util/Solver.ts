@@ -5,20 +5,23 @@ import { isEqualArray, isSubArray } from "./ArrayUtil";
 import { numbers1to9 } from "./NumberUtil";
 
 class UnsolvableError extends Error {
+    public msg: string
     constructor(msg: string) {
         super(msg);
+        this.msg = msg
         Object.setPrototypeOf(this, UnsolvableError.prototype);
     }
 }
 
 export default class Solver {
     private board: Board
+    private MAX_LOOPS = 100
 
     constructor(board: Board) {
         this.board = board
     }
     
-    public solve(bruteForceDepth = 5) {
+    public solve(bruteForceDepth = 20) {
         let prevNumFilledCells = 0
         let newNumFilledCells = 0
         let numLoops = 0
@@ -31,46 +34,59 @@ export default class Solver {
             this.solveUniqueOptions()
             this.solveSubGroupOptionRest()
             newNumFilledCells = this.calcNumFilledCells()
-        } while(prevNumFilledCells != newNumFilledCells && numLoops < 100)
+        } while(prevNumFilledCells != newNumFilledCells && numLoops < this.MAX_LOOPS)
 
         if (!this.isDone()) {
-            this.bruteForce(bruteForceDepth)
-        }
-    }
-
-    bruteForce(bruteForceDepth: number) {
-        if (bruteForceDepth > 0) {
-            const testCell = this.findBruteForceTestCell()
-            if (testCell !== undefined) {
-                for (const option of testCell.options) {
-                    const boardCopy = new Board(this.board.toDto(), false)
-                    boardCopy.getCellById(testCell.index).value = option
-                    const solver = new Solver(boardCopy)
-                    try {
-                        solver.solve(bruteForceDepth - 1)
-                        this.copyCells(boardCopy)
-                    } catch(e) {
-                        // Do nothing. Try next option
-                    }
-                }
+            try {
+                this.bruteForce(bruteForceDepth)
+            } catch(e) {
+                // Do nothing. Try next option
             }
         }
     }
 
+    bruteForce(bruteForceDepth: number) {
+        let boardCopy = null
+        if (bruteForceDepth > 0) {
+            const testCell = this.findBruteForceTestCell()
+            if (testCell !== undefined) {
+                for (let i = 0; i < testCell.options.length; ++i) {
+                    const option = testCell.options[i]
+                    boardCopy = new Board(this.board.toDto(), false)
+                    if (this.canSetValue(testCell, option)) {
+                        boardCopy.getCellById(testCell.index).value = option
+                        const solver = new Solver(boardCopy)
+                        try {
+                            solver.solve(bruteForceDepth - 1)
+                            if (solver.isDone() ) {
+                                this.copyCells(boardCopy)
+                                return
+                            }
+                        } catch(e) {
+                            if (i == testCell.options.length - 1) {
+                                throw new UnsolvableError("Could find any valid solution")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        this.copyCells(boardCopy)
+    }
+
     findBruteForceTestCell(): Cell | undefined {
-        let testCell = this.board.cells.flat().find(cell => cell.options.length == 2)
-        if (testCell !== undefined) {
-            testCell = this.board.cells.flat().find(cell => cell.options.length == 3)
+        for (let numOptions = 2; numOptions <= 9; ++numOptions) {
+            const testCell = this.board.cells.flat().filter(cell => !cell.value).find(cell => cell.options.length == numOptions)
+            if (testCell !== undefined) {
+                return testCell
+            }
         }
-        if (testCell !== undefined) {
-            testCell = this.board.cells.flat().find(cell => cell.options.length == 4)
-        }
-        return testCell
     }
 
     copyCells(otherBoard: Board) {
         this.board.cells.flat().forEach(cell => {
             cell.value = otherBoard.getCellById(cell.index).value
+            cell.options = otherBoard.getCellById(cell.index).options
         })
     }
 
@@ -84,7 +100,7 @@ export default class Solver {
             if (this.completeColumns()) changed = true
             if (this.completeBoxes()) changed = true
             if (this.completeAreas()) changed = true
-        } while (changed && numLoops < 100)
+        } while (changed && numLoops < this.MAX_LOOPS)
     }
 
     completeAreas(): boolean {
@@ -140,7 +156,7 @@ export default class Solver {
     }
 
     fillSingleMissingCell(cells: Cell[], value: number) {
-        cells.find(cell => !cell.value).value = value
+        this.setValue(cells.find(cell => !cell.value), value)
     }
 
     findMissingValue(cells: Cell[]): number | null {
@@ -165,10 +181,10 @@ export default class Solver {
             this.reduceAreaOptionsLowAndHighNumbers()
             this.reduceTwoCellAreas()
             this.reduceIfClosedSubset()
-            this.reduceImpossibleNumbers()
-            this.reduceMustHaveNumbersInAreas()
+            //this.reduceImpossibleNumbers()
+            //this.reduceMustHaveNumbersInAreas()
             newNumOptions = this.sumNumOptions()
-        } while(prevNumOptions != newNumOptions && numLoops < 100)
+        } while(prevNumOptions != newNumOptions && numLoops < this.MAX_LOOPS)
     }
 
     sumNumOptions() {
@@ -198,6 +214,12 @@ export default class Solver {
                 }
             }
         }
+    }
+
+    reduceDirectOptionsForFilledCell(cell: Cell) {
+        this.board.getRow(cell.row).forEach(cell => cell.removeOption(cell.value))
+        this.board.getCol(cell.col).forEach(cell => cell.removeOption(cell.value))
+        this.board.getBoxByCoordinates(cell.row, cell.col).forEach(cell => cell.removeOption(cell.value))
     }
 
     reduceAreaOptionsLowAndHighNumbers() {
@@ -342,7 +364,7 @@ export default class Solver {
         for (let i = 0; i < emptyCells.length; ++i) {
             const isUnique = allSolutions.filter(solution => solution[i] == allSolutions[0][i]).length == allSolutions.length
             if (isUnique) {
-                emptyCells[i].value = allSolutions[0][i]
+                this.setValue(emptyCells[i], allSolutions[0][i])
             }
         }
     }
@@ -416,7 +438,7 @@ export default class Solver {
     solveSingleOptions() {
         this.board.cells.flat().forEach(cell => {
             if (!cell.value && cell.options.length == 1) {
-                cell.value = cell.options[0]
+                this.setValue(cell, cell.options[0])
             }
         })
     }
@@ -433,7 +455,7 @@ export default class Solver {
         numbers1to9().filter(val => !filledValues.includes(val)).forEach(val => {
             const numOptions = emptyCells.filter(cell => cell.options.includes(val)).length
             if (numOptions == 1) {
-                cells.find(cell => cell.options.includes(val)).value = val
+                this.setValue(cells.find(cell => cell.options.includes(val)), val)
             }
         })
     }
@@ -454,9 +476,9 @@ export default class Solver {
             })
 
             if (emptyCells.length - subgroupsNumCells == 1) {
-                emptyCells.find(cell => {
+                this.setValue(emptyCells.find(cell => {
                     return !optionSubgroups.find(options => isEqualArray(options, cell.options))
-                }).value = remainingValue - subgroupsValue
+                }), remainingValue - subgroupsValue)
             }
         })
     }
@@ -481,5 +503,20 @@ export default class Solver {
 
     isDone(): boolean {
         return this.board.cells.flat().find(cell => !cell.value) === undefined
+    }
+
+    setValue(cell: Cell, value: number): void {
+        if (this.canSetValue(cell, value)) {
+            cell.value = value
+            this.reduceDirectOptionsForFilledCell(cell)
+        } else {
+            throw new UnsolvableError("Cannot set " + value + " in cell " + cell.index)
+        }
+    }
+
+    canSetValue(cell: Cell, value: number): boolean {
+        return !this.board.getRow(cell.row).find(cell => cell.value == value) &&
+        !this.board.getCol(cell.col).find(cell => cell.value == value) &&
+        !this.board.getBoxByCell(cell).find(cell => cell.value == value)
     }
 }
