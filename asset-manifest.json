@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/killer-sudoku-solver/static/css/main.80ab13dd.css",
-    "main.js": "/killer-sudoku-solver/static/js/main.5b48c69f.js",
+    "main.js": "/killer-sudoku-solver/static/js/main.0cb79f27.js",
     "index.html": "/killer-sudoku-solver/index.html",
     "main.80ab13dd.css.map": "/killer-sudoku-solver/static/css/main.80ab13dd.css.map",
-    "main.5b48c69f.js.map": "/killer-sudoku-solver/static/js/main.5b48c69f.js.map"
+    "main.0cb79f27.js.map": "/killer-sudoku-solver/static/js/main.0cb79f27.js.map"
   },
   "entrypoints": [
     "static/css/main.80ab13dd.css",
-    "static/js/main.5b48c69f.js"
+    "static/js/main.0cb79f27.js"
   ]
 }
