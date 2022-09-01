@@ -7,7 +7,7 @@ export function numbers1to9(): number[] {
 }
 
 export function numbersXtoY(x: number, y: number): number[] {
-    return Array.from(Array(y - x).keys()).map(val => val + x)
+    return Array.from(Array(y - x + 1).keys()).map(val => val + x)
 }
 
 export function stringToNumber(key: string): number | null {

@@ -50,8 +50,7 @@ class SolverComponent extends Component<SolverComponentProps, SolverComponentSta
         this.setSolving(true)
         window.setTimeout(() => {
             try {
-                const boardCopy = new Board(this.props.board.toDto(), false)
-                const solver = new Solver(boardCopy)
+                const solver = new Solver(this.props.board)
                 solver.solve()
                 dispatchSetBoard(this.props.board)
             } catch(e) {
