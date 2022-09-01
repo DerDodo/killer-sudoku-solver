@@ -189,3 +189,18 @@ test('sudoku 12', async () => {
     ]
     await testSudoku("./src/assets/sudoku-12.jpg", areaValues)
 })
+
+test('sudoku 17', async () => {
+    const areaValues = [
+        19, 16, 13, 17, 10,
+        8, 8, 11,
+        14, 4, 5, 23, 13,
+        9, 15, 17,
+        12, 15, 16, 17,
+        6, 22, 20,
+        11, 6, 3,
+        15, 15, 10, 3, 13,
+        19
+    ]
+    await testSudoku("./src/assets/sudoku-17.jpg", areaValues)
+})

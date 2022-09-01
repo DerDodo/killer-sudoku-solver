@@ -76,8 +76,8 @@ export default class MenuComponent extends Component {
 
     loadFromScreenshot(event: ChangeEvent<HTMLInputElement>) {
         const file = event.currentTarget.files[0]
-        if (file.type && file.type != 'image/jpeg') {
-            console.log('File is not a jpg.', file.type, file)
+        if (file.type && !file.type.startsWith('image/')) {
+            console.log('File is not an image.', file.type, file)
             return
         }
         const reader = new FileReader()
@@ -86,7 +86,6 @@ export default class MenuComponent extends Component {
     }
 
     async onScreenshotLoad(event: ProgressEvent<FileReader>) {
-        console.log("Loading successful")
         const parser = new ScreenshotParser()
         parser.load(event.target.result as string).then(() => {
             const board = parser.parse()

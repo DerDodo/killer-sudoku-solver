@@ -24,3 +24,9 @@
 #file-selector, #screenshot-selector {
     display: none;
 }
+
+@media only screen and (max-width: 900px) {
+    .fileMenu {
+        left: 0;
+    }
+}

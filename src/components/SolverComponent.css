@@ -13,3 +13,10 @@ button {
 button:hover {
     background-color: rgb(231, 232, 241);
 }
+
+@media only screen and (max-width: 900px) {
+    .solver {
+        text-align: right;
+        right: 0;
+    }
+}

@@ -8,6 +8,7 @@ import InputManagerComponent from "./components/InputManagerComponent"
 import SolverComponent from "./components/SolverComponent"
 import "./index.css"
 import "./util/colors.css"
+import KeyboardComponent from "./components/KeyboardComponent"
 
 const rootElement = document.getElementById("root")
 const root = createRoot(rootElement)
@@ -18,5 +19,6 @@ root.render(
       <InputManagerComponent />
       <SolverComponent />
       <BoardComponent />
+      <KeyboardComponent />
     </Provider>
 )

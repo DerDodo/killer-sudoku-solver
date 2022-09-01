@@ -1,0 +1,15 @@
+.keyboard {
+    display: none;
+}
+
+.keyboard button {
+    font-size: 2em;
+    width: 16%;
+    margin: 0.2em 2%;
+}
+
+@media (pointer: coarse) and (hover: none) {
+    .keyboard {
+        display: block;
+    }
+}

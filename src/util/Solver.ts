@@ -21,7 +21,21 @@ export default class Solver {
         this.board = board
     }
     
-    public solve(bruteForceDepth = 20) {
+    public solve() {
+        const boardCopy = new Board(this.board.toDto(), false)
+        const solver = new Solver(boardCopy)
+        solver._solve(false)
+        if (!solver.isDone()) {
+            const boardCopy2 = new Board(this.board.toDto(), false)
+            const solver2 = new Solver(boardCopy2)
+            solver2._solve(true)
+            this.copyCells(boardCopy2)
+        } else {
+            this.copyCells(boardCopy)
+        }
+    }
+    
+    private _solve(withSpecialOptionsReducers = false, bruteForceDepth = 30) {
         let prevNumFilledCells = 0
         let newNumFilledCells = 0
         let numLoops = 0
@@ -29,7 +43,7 @@ export default class Solver {
             numLoops += 1
             prevNumFilledCells = this.calcNumFilledCells()
             this.completeSingleMissingValues()
-            this.calcOptions()
+            this.calcOptions(withSpecialOptionsReducers)
             this.solveSingleOptions()
             this.solveUniqueOptions()
             this.solveSubGroupOptionRest()
@@ -38,14 +52,14 @@ export default class Solver {
 
         if (!this.isDone()) {
             try {
-                this.bruteForce(bruteForceDepth)
+                this.bruteForce(withSpecialOptionsReducers, bruteForceDepth)
             } catch(e) {
                 // Do nothing. Try next option
             }
         }
     }
 
-    bruteForce(bruteForceDepth: number) {
+    bruteForce(withSpecialOptionsReducers: boolean, bruteForceDepth: number) {
         let boardCopy = null
         if (bruteForceDepth > 0) {
             const testCell = this.findBruteForceTestCell()
@@ -57,7 +71,7 @@ export default class Solver {
                         boardCopy.getCellById(testCell.index).value = option
                         const solver = new Solver(boardCopy)
                         try {
-                            solver.solve(bruteForceDepth - 1)
+                            solver._solve(withSpecialOptionsReducers, bruteForceDepth - 1)
                             if (solver.isDone() ) {
                                 this.copyCells(boardCopy)
                                 return
@@ -169,7 +183,7 @@ export default class Solver {
         }
     }
 
-    calcOptions() {
+    calcOptions(withSpecialOptionsReducers: boolean) {
         this.fillAllOptions()
         let prevNumOptions = 0
         let newNumOptions = 0
@@ -181,8 +195,10 @@ export default class Solver {
             this.reduceAreaOptionsLowAndHighNumbers()
             this.reduceTwoCellAreas()
             this.reduceIfClosedSubset()
-            //this.reduceImpossibleNumbers()
-            //this.reduceMustHaveNumbersInAreas()
+            if (withSpecialOptionsReducers) {
+                this.reduceImpossibleNumbers()
+                this.reduceMustHaveNumbersInAreas()
+            }
             newNumOptions = this.sumNumOptions()
         } while(prevNumOptions != newNumOptions && numLoops < this.MAX_LOOPS)
     }

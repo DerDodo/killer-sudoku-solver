@@ -1,9 +1,13 @@
 export function numbers0to8(): number[] {
-    return Array.from(Array(9).keys()).map(val => val)
+    return numbersXtoY(0, 8)
 }
 
 export function numbers1to9(): number[] {
-    return Array.from(Array(9).keys()).map(val => val + 1)
+    return numbersXtoY(1, 9)
+}
+
+export function numbersXtoY(x: number, y: number): number[] {
+    return Array.from(Array(y - x).keys()).map(val => val + x)
 }
 
 export function stringToNumber(key: string): number | null {

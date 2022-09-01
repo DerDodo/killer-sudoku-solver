@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Component } from 'react'
 import { connect } from 'react-redux'
 import { RootState } from '../store'
+import { dispatchSetBoard } from '../store/GameSlice'
 import Board from '../types/Board'
 import Solver from '../util/Solver'
 import "./SolverComponent.css"
@@ -26,7 +27,7 @@ class SolverComponent extends Component<SolverComponentProps, SolverComponentSta
 
     render() {
         return (
-            <div className="sideMenu">
+            <div className="sideMenu solver">
                 <button onClick={ this.startSolve } disabled={ this.state.solving }>Solve</button>
                 { this.renderIndicator() }
             </div>
@@ -48,9 +49,11 @@ class SolverComponent extends Component<SolverComponentProps, SolverComponentSta
     startSolve() {
         this.setSolving(true)
         window.setTimeout(() => {
-            const solver = new Solver(this.props.board)
             try {
+                const boardCopy = new Board(this.props.board.toDto(), false)
+                const solver = new Solver(boardCopy)
                 solver.solve()
+                dispatchSetBoard(this.props.board)
             } catch(e) {
                 // Do nothing. Try next option
             }

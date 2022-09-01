@@ -4,7 +4,7 @@
 }
 
 body, button {
-    font-size: 18px;
+    font-size: 0.5cm;
     font-family: "Century Gothic", CenturyGothic, Geneva, AppleGothic, sans-serif;
 }
 
@@ -22,4 +22,17 @@ body {
     color: rgb(197, 198, 206);
     margin-top: 1em;
     clear: both;
+}
+
+@media only screen and (max-width: 900px) {
+    .sideMenu {
+        position: fixed;
+        bottom: 0;
+        width: 45%;
+        font-size: 1.2em;
+    }
+
+    body, button {
+        font-size: 0.37cm;
+    }
 }

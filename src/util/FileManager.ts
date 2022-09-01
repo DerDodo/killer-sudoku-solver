@@ -34,7 +34,7 @@ export default class FileManager {
         if (save) {
           return new Board(JSON.parse(save) as BoardDto, true)
         } else {
-          return new Board({ cells: this.initCells(), areas: [] }, true)
+          return new Board({ cells: this.initCells(), areas: [] } as BoardDto, true)
         }
     }
 
